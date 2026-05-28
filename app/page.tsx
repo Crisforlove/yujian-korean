@@ -142,7 +142,8 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
   };
 
   // Highly refined, premium spring interactions (inspired by MagicUI + Josh Comeau + premium language tools)
-  // Feels expensive, alive, and deeply satisfying while staying calm and healing
+  // Feels expensive, alive, and deeply satisfying while staying calm and healing.
+  // Stronger hover lift + layered shadows for tactile "premium paper" feel.
   const cardVariants = {
     rest: {
       scale: 1,
@@ -150,19 +151,19 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
       boxShadow: '0 1px 2px rgba(47, 44, 39, 0.03), 0 0 0 1px rgba(0,0,0,0.025)',
     },
     hover: {
-      scale: 1.018,
-      y: -4,
-      boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.12), 0 10px 20px -8px rgb(0 0 0 / 0.08), 0 0 0 1px rgba(127,143,122,0.18)',
+      scale: 1.022,
+      y: -5,
+      boxShadow: '0 30px 60px -15px rgb(0 0 0 / 0.14), 0 12px 24px -10px rgb(0 0 0 / 0.1), 0 0 0 1px rgba(127,143,122,0.22)',
     },
     tap: {
-      scale: 0.982,
+      scale: 0.98,
       y: 0,
       boxShadow: '0 1px 2px rgba(47, 44, 39, 0.03)',
     },
     focus: {
-      scale: 1.012,
-      y: -2,
-      boxShadow: '0 12px 24px -8px rgb(0 0 0 / 0.1), 0 0 0 3px rgba(127,143,122,0.25)',
+      scale: 1.014,
+      y: -2.5,
+      boxShadow: '0 14px 28px -10px rgb(0 0 0 / 0.12), 0 0 0 3px rgba(127,143,122,0.28)',
     },
   } as const;
 
@@ -398,9 +399,9 @@ function WordDetailModal({
             className={`add-learning-button relative ${addSuccess ? 'add-learning-button--success' : ''}`}
             whileTap={!(isAdding || addSuccess) ? { scale: 0.975 } : {}}
             animate={{ 
-              scale: addSuccess ? 1.02 : 1,
+              scale: addSuccess ? [1, 1.035, 1.02] : 1,
             }}
-            transition={{ type: "spring", stiffness: 280, damping: 22 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
           >
             {/* Tasteful expanding ring — very light, premium, healing (expands softly outward and fades) */}
             <AnimatePresence>
@@ -669,11 +670,11 @@ function HistorySentenceCard({
         delay: entranceDelay,
       }}
       whileHover={{
-        y: -2.5,
-        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-        transition: { type: "spring", stiffness: 380, damping: 26 },
+        y: -3.5,
+        boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.13), 0 10px 20px -8px rgb(0 0 0 / 0.1)',
+        transition: { type: "spring", stiffness: 340, damping: 24 },
       }}
-      whileTap={{ scale: 0.985, y: 0.5 }}
+      whileTap={{ scale: 0.983, y: 0.5 }}
     >
       <div className="history-item-meta">
         <span className="history-date">{formatHistoryDate(item.addedAt)}</span>
@@ -799,11 +800,11 @@ function WordBankCard({
         delay: entranceDelay,
       }}
       whileHover={{
-        y: -2.5,
-        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-        transition: { type: "spring", stiffness: 380, damping: 26 },
+        y: -3.5,
+        boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.13), 0 10px 20px -8px rgb(0 0 0 / 0.1)',
+        transition: { type: "spring", stiffness: 340, damping: 24 },
       }}
-      whileTap={{ scale: 0.985, y: 0.5 }}
+      whileTap={{ scale: 0.983, y: 0.5 }}
     >
       <div className="flex items-start justify-between gap-3">
         <div>

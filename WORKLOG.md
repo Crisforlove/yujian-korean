@@ -986,3 +986,39 @@ Vercel 应该会自动开始部署（如果已连接 GitHub）。
 你也可以去 Vercel Dashboard 手动触发最新部署。
 
 部署完成后访问你的 Vercel 域名即可看到最新版本。
+
+[2026-05-28 19:55:00] 持续优化「灵动」与「想停留」体验：
+- TokenCard hover 进一步强化（更高级的阴影层次 + 更自然的 spring）
+- Etymology badge pop 更优雅有质感
+- History 卡片 hover lift 加强
+- 结果面板入场更从容
+- 空状态呼吸动画更柔和
+- 成功反馈按钮 scale 更自然
+
+所有改动已提交并推送（最新 commit 1330582 + 之前的 489c810 等）
+
+参考仓库：MagicUI、ibelick/motion-primitives、Josh Comeau 风格
+目标：克制但明显高级、让人想多待一会儿的「纸本高级札记」感觉。
+
+用户可随时执行 ./scripts/deploy.sh 更新线上版本。
+
+[2026-05-28 20:05:00] 用户要求：先调研目前最受欢迎的界面和交互风格，然后给出建议并执行优化（不再频繁询问）。
+
+调研总结（2025-2026 当前趋势）：
+- Calm Premium 审美大热：低饱和、 generous whitespace、纸感/材质、精致排版（类似 Linear、Serene、shadcn 高级主题）。
+- 灵动交互不是花哨，而是「有目的、极致克制却有生命力」的微交互（MagicUI、ibelick/motion-primitives、Josh Comeau 风格）。
+- 语言学习类：从重度游戏化转向「平静导师」体验（Drops、Headspace 式情绪设计 + 优雅微反馈）。
+- 顶级参考仓库：
+  - magicuidesign/magicui（动画组件首选）
+  - ibelick/motion-primitives（干净高质 motion 基础）
+  - jibcamun/Serene（极致 calm premium 仪表盘）
+  - shadcn-ui 生态 + Aceternity 灵感组件
+  - 语言学习参考：trylingo、wordpecker-app（克制版微交互）
+
+执行方向（已开始）：
+- TokenCard hover / 入场 / 徽章反馈进一步精炼（MagicUI + Josh Comeau 式 spring）
+- History 卡片与空状态持续打磨（更强的「想停留」邀请感）
+- 成功反馈与整体材质感强化
+- 保持「安静高级治愈」核心调性，只加「有呼吸的灵动」
+
+所有改动会实时记录在此日志，用户可继续 tail -f 查看。
