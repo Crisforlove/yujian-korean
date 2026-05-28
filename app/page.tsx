@@ -141,28 +141,28 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
     }
   };
 
-  // Premium, calm spring-driven interactions (inspired by MagicUI + Josh Comeau style)
-  // Goal: Feels expensive and alive, but still healing and restrained
+  // Highly refined, premium spring interactions (inspired by MagicUI + Josh Comeau + premium language tools)
+  // Feels expensive, alive, and deeply satisfying while staying calm and healing
   const cardVariants = {
     rest: {
       scale: 1,
       y: 0,
-      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.025), 0 0 0 1px rgba(0,0,0,0.02)',
+      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.03), 0 0 0 1px rgba(0,0,0,0.025)',
     },
     hover: {
-      scale: 1.015,
-      y: -3,
-      boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 0 1px rgba(127,143,122,0.15)',
+      scale: 1.018,
+      y: -4,
+      boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.12), 0 10px 20px -8px rgb(0 0 0 / 0.08), 0 0 0 1px rgba(127,143,122,0.18)',
     },
     tap: {
-      scale: 0.985,
+      scale: 0.982,
       y: 0,
-      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.025)',
+      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.03)',
     },
     focus: {
-      scale: 1.01,
-      y: -1,
-      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.08), 0 0 0 3px rgba(127,143,122,0.2)',
+      scale: 1.012,
+      y: -2,
+      boxShadow: '0 12px 24px -8px rgb(0 0 0 / 0.1), 0 0 0 3px rgba(127,143,122,0.25)',
     },
   } as const;
 
@@ -214,12 +214,12 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
         <motion.span
           className={getEtymologyBadgeClass(token.etymology)}
           whileHover={{
-            scale: 1.055,
-            y: -0.5,
-            transition: { type: "spring", stiffness: 450, damping: 20 },
+            scale: 1.13,
+            y: -1.5,
+            transition: { type: "spring", stiffness: 380, damping: 15 },
           }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: "spring", stiffness: 380, damping: 22 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 320, damping: 20 }}
         >
           {ETYMOLOGY_LABELS[token.etymology]}
         </motion.span>
@@ -397,8 +397,10 @@ function WordDetailModal({
             disabled={isAdding || addSuccess}
             className={`add-learning-button relative ${addSuccess ? 'add-learning-button--success' : ''}`}
             whileTap={!(isAdding || addSuccess) ? { scale: 0.975 } : {}}
-            animate={{ scale: addSuccess ? 1.005 : 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            animate={{ 
+              scale: addSuccess ? 1.02 : 1,
+            }}
+            transition={{ type: "spring", stiffness: 280, damping: 22 }}
           >
             {/* Tasteful expanding ring — very light, premium, healing (expands softly outward and fades) */}
             <AnimatePresence>
