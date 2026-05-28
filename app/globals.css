@@ -805,37 +805,50 @@ body {
   opacity: 0.85;
 }
 
-/* Naver deep link actions — calm, secondary, premium (hybrid recommendation) */
+/* Naver deep link actions — now much more obvious (user couldn't see previous subtle version) */
 .token-naver-link {
   font-family: var(--font-sans);
   letter-spacing: 0.01em;
-  opacity: 0.75;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(127, 143, 122, 0.08);
+  border: 1px solid rgba(127, 143, 122, 0.25);
+  color: var(--color-accent-sage);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  transition: all 160ms ease;
 }
 
 .token-naver-link:hover {
-  opacity: 1;
+  background: rgba(127, 143, 122, 0.15);
+  border-color: var(--color-accent-sage);
+  color: var(--color-accent-warm);
+  transform: translateY(-1px);
 }
 
 .naver-cta-button {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-subtle);
+  gap: 0.5rem;
+  padding: 0.625rem 1.125rem;
+  background: var(--color-accent-sage);
+  color: white;
+  border: none;
   border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-accent-sage);
+  font-size: 13px;
+  font-weight: 600;
   transition: all 160ms cubic-bezier(0.23, 1, 0.32, 1);
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(127, 143, 122, 0.25);
 }
 
 .naver-cta-button:hover {
-  background: var(--color-bg-elevated);
-  border-color: var(--color-accent-sage);
-  color: var(--color-accent-warm);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: var(--color-accent-warm);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(127, 143, 122, 0.3);
 }
 
 /* Naver quick preview block inside modal — calm, secondary information layer */

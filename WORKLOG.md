@@ -1156,6 +1156,8 @@ To https://github.com/Crisforlove/yujian-korean.git
   - 零风险：所有核心数据仍由 LLM 负责句子拆解，本地存储不变
   - Build 通过，样式完全复用 design tokens
 
-  额外完成：
-  - WordDetailModal 内自动加载 Naver 快速预览（使用新 API 路由），展示简洁释义与例句
-  - 预览失败时自动隐藏数据区，仅保留强有力的「完整跳转」按钮，体验非常稳健
+  额外完成（用户反馈“完全没看到 / 没变化”后）：
+  - 紧急把 Naver 入口从“克制优雅”升级为“明显可见”：
+    - TokenCard：小 pill 带浅底色和边框，字体 11px
+    - Modal：独立带背景的醒目区块 + 大实色按钮 + “无需配置 Key” 标签
+  - 这样即使预览拉不到数据，用户也能一眼看到明显的 Naver 入口

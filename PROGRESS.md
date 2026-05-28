@@ -254,8 +254,9 @@ Vercel 部署：
 
 [实时更新] 2026-05-28 21:05 — Naver 词典混合体验（按推荐方案）
 - 采用「跳转 Naver 官方」作为主力 + 内部预览 API 作为辅助的混合策略（最推荐路线）
-- 在 TokenCard 和 WordDetailModal 都增加了优雅的「在 Naver 词典查看」入口（带 Hanja 直达）
+- **已大幅强化可见度**（用户反馈“没变化”后紧急调整）：
+  - TokenCard 里的 Naver 入口改成明显带底色的小 pill，字体更大，更容易看到
+  - Modal 里 Naver 区块改成带背景色 + 醒目标题 + 大按钮 + “无需配置 Key” 徽章
+  - 按钮改成实色背景（sage 色），hover 有明显反馈
 - 新建安全 /api/naver-dict 路由（带 Referer+UA、缓存、短超时、优雅降级）
-- 在详情 Modal 里增加了「Naver 快速预览」区块：自动加载、展示前 1-2 条释义 + 例句，失败时静默显示提示 + 强跳转按钮
-- 所有样式使用设计令牌，保持 calm premium 质感
 - Build 完全通过

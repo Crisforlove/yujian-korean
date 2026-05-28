@@ -254,17 +254,17 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
         <div className="token-hanja">{token.hanja}</div>
       )}
 
-      {/* Naver deep link — our recommended way to access the absolute best etymology + Hanja visuals */}
+      {/* Prominent Naver entry — main way to access best etymology + Hanja (no API config needed) */}
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           window.open(getNaverDictUrl(token.text), '_blank', 'noopener,noreferrer');
         }}
-        className="token-naver-link text-[10px] text-[var(--color-accent-sage)] hover:text-[var(--color-accent-warm)] transition-colors flex items-center gap-1 mt-1.5"
-        title="在 Naver 词典中查看完整词源、汉字与例句"
+        className="token-naver-link"
+        title="在 Naver 词典中查看完整词源、汉字讲解与大量例句（无需配置任何 Key）"
       >
-        在 Naver 查看 <ExternalLink className="w-3 h-3" />
+        在 Naver 词典查看完整内容 <ExternalLink className="w-3.5 h-3.5" />
       </button>
 
       {/* Gentle "click to see details" affordance — responds to card hover state via variants */}
@@ -451,72 +451,46 @@ function WordDetailModal({
           )}
         </div>
 
-        {/* Naver Quick Preview (lightweight, from our safe api route) + strong CTA buttons */}
-        {naverPreview.fetched && (
-          <div className="word-detail-naver-preview mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] text-[var(--color-text-tertiary)] tracking-wide">Naver 快速预览</span>
-              {naverPreview.loading && (
-                <span className="text-[10px] text-[var(--color-text-muted)] flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin" /> 正在获取
-                </span>
-              )}
-            </div>
-
-            {!naverPreview.loading && naverPreview.items.length > 0 && (
-              <div className="space-y-2 text-sm">
-                {naverPreview.items.slice(0, 2).map((item, idx) => (
-                  <div key={idx} className="rounded-lg bg-[var(--color-bg-surface)] p-3 border border-[var(--color-border-subtle)]">
-                    {item.means && item.means.length > 0 && (
-                      <div className="text-[var(--color-text-secondary)]">
-                        {item.means[0]?.value}
-                        {item.means[0]?.partOfSpeech && (
-                          <span className="ml-1.5 text-[10px] text-[var(--color-text-muted)]">· {item.means[0].partOfSpeech}</span>
-                        )}
-                      </div>
-                    )}
-                    {item.examples && item.examples[0] && (
-                      <div className="mt-1.5 text-xs text-[var(--color-text-tertiary)] korean-text">
-                        {item.examples[0].origin}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {!naverPreview.loading && naverPreview.items.length === 0 && (
-              <div className="text-xs text-[var(--color-text-muted)]">预览数据暂不可用（已为您准备完整跳转）</div>
-            )}
-
-            <div className="mt-3 text-[10px] text-[var(--color-text-muted)]">
-              预览来自 Naver · 完整词源、汉字讲解与更多例句请点击下方按钮
-            </div>
+        {/* Very prominent Naver section — this is now impossible to miss (no API key needed) */}
+        <div className="word-detail-naver-cta mt-5 pt-4 border-t-2 border-[var(--color-accent-sage)]/30 bg-[var(--color-bg-surface)] rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm font-semibold text-[var(--color-accent-sage)]">Naver 词典（推荐）</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-accent-sage)]/10 text-[var(--color-accent-sage)]">无需配置 Key</span>
           </div>
-        )}
-
-        {/* Naver Dictionary deep link — the best way to see rich etymology tags, Hanja visuals & full examples (recommended hybrid approach) */}
-        <div className="word-detail-naver-cta mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
-          <div className="text-[11px] text-[var(--color-text-tertiary)] mb-2 tracking-wide">
-            Naver 词典提供最完整的词源分类（固有词 / 汉字词 / 外来词）、汉字详解与丰富例句
+          <div className="text-xs text-[var(--color-text-tertiary)] mb-3">
+            这里有最完整的词源分类（固有词 / 汉字词 / 外来词）、汉字详解、图片词源讲解和大量例句。
           </div>
+
+          {/* Quick preview if data available */}
+          {naverPreview.fetched && naverPreview.items.length > 0 && (
+            <div className="mb-3 space-y-1.5">
+              {naverPreview.items.slice(0, 1).map((item, idx) => (
+                <div key={idx} className="text-sm text-[var(--color-text-secondary)] bg-white/50 rounded p-2">
+                  {item.means?.[0]?.value}
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => window.open(getNaverDictUrl(token.text), '_blank', 'noopener,noreferrer')}
-              className="naver-cta-button flex items-center gap-1.5"
+              className="naver-cta-button flex-1 justify-center"
             >
-              在 Naver 词典查看完整内容
-              <ExternalLink className="w-3.5 h-3.5" />
+              立即去 Naver 词典查看完整内容 <ExternalLink className="w-4 h-4" />
             </button>
             {token.hanja && (
               <button
                 onClick={() => window.open(getNaverHanjaUrl(token.hanja!), '_blank', 'noopener,noreferrer')}
-                className="naver-cta-button flex items-center gap-1.5"
+                className="naver-cta-button flex-1 justify-center"
               >
-                查看汉字词源
-                <ExternalLink className="w-3.5 h-3.5" />
+                查看汉字词源讲解 <ExternalLink className="w-4 h-4" />
               </button>
             )}
+          </div>
+
+          <div className="text-[10px] text-center text-[var(--color-text-muted)] mt-2">
+            点击按钮直接打开 Naver 官方页面（数据最全、最漂亮）
           </div>
         </div>
 
