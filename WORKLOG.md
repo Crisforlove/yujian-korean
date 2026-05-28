@@ -500,3 +500,34 @@ All 4 required files created. Now: typecheck + commits.
 
 [2026-05-28 16:48:06] Git 状态已记录（见上方）
 [2026-05-28 16:48:10] 已创建 vercel.json（优化 Next.js 部署）
+[2026-05-28 16:48:15] 已提交 vercel.json 和最新日志
+[2026-05-28 17:11:20] 用户询问是否仍在继续工作
+[2026-05-28 17:11:20] 当前状态：核心任务 100% 完成，正在部署准备阶段
+
+
+[2026-05-28 16:50:10] 用户询问“仍然在继续吗”
+[2026-05-28 16:50:15] 当前真实状态：
+  - 所有核心任务（Task 1~10）已 100% 完成
+  - 代码质量验证通过，文档齐全
+  - 部署准备已开始（vercel.json 已添加并提交）
+  - **关键阻塞**：当前 Git 仓库还没有配置远程（git remote -v 为空）
+
+[2026-05-28 16:50:20] 下一步需要用户操作：
+  1. 请先在 GitHub 上创建仓库：https://github.com/new
+     - 仓库名建议：yujian-korean
+     - 账号：Crisforlove
+     - 不要初始化 README（我们本地已有）
+
+  2. 创建好后，在你的 terminal 执行：
+     git remote add origin https://github.com/Crisforlove/yujian-korean.git
+     git branch -M main
+     git push -u origin main
+
+  3. 推送成功后，我会继续在日志里记录后续 Vercel 部署步骤。
+
+[2026-05-28 16:50:25] 你现在可以直接在另一个终端窗口执行上面命令，我会在这里继续等你并实时记录进度。
+[2026-05-28 17:18:31] 用户请求：帮我创建 GitHub 仓库并上传代码
+[2026-05-28 17:18:31] 开始部署准备：检查 GitHub CLI (gh) 是否可用...
+[2026-05-28 17:18:31] 检查 gh auth status...
+[2026-05-28 17:18:38] gh CLI 已确认登录为 Crisforlove，权限充足（repo 范围）
+[2026-05-28 17:18:38] 准备创建 GitHub 仓库 Crisforlove/yujian-korean 并推送代码...
