@@ -113,11 +113,11 @@ export async function POST(request: Request) {
     if (provider === 'anthropic') {
       finalAnalysis = await callAnthropic(sentence, providedKey, parsed.data.model);
     } else if (provider === 'openai' || provider === 'deepseek') {
-      const baseURL = provider === 'deepseek' 
-        ? 'https://api.deepseek.com' 
-        : undefined;
-      
-      finalAnalysis = await callOpenAICompatible(sentence, providedKey, provider, baseURL, parsed.data.model);
+      // Allow user-provided baseURL for relays (中转站). Fall back to official endpoints.
+      const defaultBase = provider === 'deepseek' ? 'https://api.deepseek.com' : undefined;
+      const effectiveBaseURL = parsed.data.baseURL || defaultBase;
+
+      finalAnalysis = await callOpenAICompatible(sentence, providedKey, provider, effectiveBaseURL, parsed.data.model);
     } else if (provider === 'gemini') {
       finalAnalysis = await callGemini(sentence, providedKey, parsed.data.model);
     } else {
@@ -194,11 +194,15 @@ async function callOpenAICompatible(
   baseURL?: string,
   modelOverride?: string
 ): Promise<AnalyzedSentenceSchema> {
+  // Use a clean, standard User-Agent to avoid being blocked by some relays (中转站)
   const openai = new OpenAI({
     apiKey,
     baseURL: baseURL || undefined,
     timeout: 60_000,
     maxRetries: 1,
+    defaultHeaders: {
+      'User-Agent': 'Yujian/1.0 (https://github.com/Crisforlove/yujian-korean)',
+    },
   });
 
   const model = modelOverride || (provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o');

@@ -132,6 +132,7 @@ export const analyzeRequestSchema = z
     provider: providerSchema.default('anthropic'),
     apiKey: z.string().min(10, 'API key appears too short').max(200, 'API key too long'),
     model: z.string().optional(), // optional per-provider model override
+    baseURL: z.string().url().optional(), // custom base URL for relays / 中转站
   })
   .strict();
 

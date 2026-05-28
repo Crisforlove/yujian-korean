@@ -63,6 +63,7 @@ export async function analyzeSentenceWithKey(
   apiKey: string,
   provider: SupportedProvider = 'anthropic',
   model?: string,
+  baseURL?: string,
   options: AnalyzeOptions = {}
 ): Promise<AnalyzedSentence> {
   const operation = 'analyzeSentenceWithKey';
@@ -89,6 +90,7 @@ export async function analyzeSentenceWithKey(
         provider,
         apiKey,
         model,
+        baseURL,
       }),
       signal: options.signal,
     });
@@ -152,6 +154,7 @@ export async function analyzeSentence(
   apiKey: string | undefined | null,
   provider: SupportedProvider = 'anthropic',
   model?: string,
+  baseURL?: string,
   options: AnalyzeOptions = {}
 ): Promise<AnalyzedSentence> {
   if (!apiKey) {
@@ -161,5 +164,5 @@ export async function analyzeSentence(
       'MISSING_KEY'
     );
   }
-  return analyzeSentenceWithKey(sentence, apiKey, provider, model, options);
+  return analyzeSentenceWithKey(sentence, apiKey, provider, model, baseURL, options);
 }

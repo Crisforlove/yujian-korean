@@ -1207,7 +1207,10 @@ export default function SentenceAnalyzerPage() {
 
     try {
       // Call the secure facade (routes through /api/analyze — key never leaves server scope)
-      const analysis = await analyzeSentenceWithKey(trimmedSentence, keyToUse, provider, selectedModel || undefined);
+      const customBase = (provider === 'openai' || provider === 'deepseek') 
+        ? localStorage.getItem(`yujian:baseURL:${provider}`) || undefined 
+        : undefined;
+      const analysis = await analyzeSentenceWithKey(trimmedSentence, keyToUse, provider, selectedModel || undefined, customBase);
 
       // Success! Set result immediately for beautiful rendering
       setResult(analysis);
@@ -1331,7 +1334,10 @@ export default function SentenceAnalyzerPage() {
     setIsWordLookupLoading(true);
     try {
       // Reuse the exact same secure pipeline. LLM prompt handles single-word gracefully (returns 1 token).
-      const analysis = await analyzeSentenceWithKey(trimmed, keyToUse, provider, selectedModel || undefined);
+      const customBase = (provider === 'openai' || provider === 'deepseek') 
+        ? localStorage.getItem(`yujian:baseURL:${provider}`) || undefined 
+        : undefined;
+      const analysis = await analyzeSentenceWithKey(trimmed, keyToUse, provider, selectedModel || undefined, customBase);
 
       if (analysis.tokens && analysis.tokens.length > 0) {
         // Open detail using first token + the mini-analysis as context (provides example)
@@ -2369,7 +2375,11 @@ export default function SentenceAnalyzerPage() {
                     setKeyTestError(null);
                     try {
                       const modelToTest = selectedModel || currentProviderConfig.defaultModel || '';
-                      await analyzeSentenceWithKey('안녕하세요.', apiKey.trim(), provider, modelToTest || undefined);
+                      // Pass custom baseURL if user has set one for relays
+                      const customBase = (provider === 'openai' || provider === 'deepseek') 
+                        ? (localStorage.getItem(`yujian:baseURL:${provider}`) || undefined) 
+                        : undefined;
+                      await analyzeSentenceWithKey('안녕하세요.', apiKey.trim(), provider, modelToTest || undefined, customBase);
                       alert('✅ Key 验证通过！可以正常使用。');
                     } catch (e: any) {
                       const message = e?.message || 'Key 测试失败';
@@ -2387,6 +2397,32 @@ export default function SentenceAnalyzerPage() {
                   （使用 {currentProviderConfig.label}{selectedModel ? ` / ${selectedModel}` : ''}，消耗极少 token）
                 </span>
 
+                {/* Custom Base URL for relays (中转站) */}
+                {(provider === 'openai' || provider === 'deepseek') && (
+                  <div className="mt-3">
+                    <label className="block text-xs text-[var(--color-text-secondary)] mb-1">
+                      自定义 Base URL（中转站专用，可选）
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue={typeof window !== 'undefined' ? localStorage.getItem(`yujian:baseURL:${provider}`) || '' : ''}
+                      onChange={(e) => {
+                        const val = e.target.value.trim();
+                        if (val) {
+                          localStorage.setItem(`yujian:baseURL:${provider}`, val);
+                        } else {
+                          localStorage.removeItem(`yujian:baseURL:${provider}`);
+                        }
+                      }}
+                      placeholder="https://api.example.com/v1"
+                      className="w-full text-sm px-3 py-2 rounded border border-[var(--color-border)] bg-[var(--color-bg-surface)]"
+                    />
+                    <div className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                      如果你使用中转站，请在这里填写完整 Base URL（包含 /v1）
+                    </div>
+                  </div>
+                )}
+
                 {keyTestError && (
                   <div className="mt-2 p-3 rounded border border-red-300 bg-red-50 text-sm text-red-800">
                     <div className="font-medium mb-1">Key 测试失败（403）</div>
@@ -2396,11 +2432,12 @@ export default function SentenceAnalyzerPage() {
                       • Key 无效、过期或权限不足<br/>
                       • 账户没有余额 / 免费额度已用完<br/>
                       • 没有开通对应模型的使用权限<br/>
-                      • Key 和当前选择的提供商不匹配<br/><br/>
+                      • Key 和当前选择的提供商不匹配<br/>
+                      • 中转站对请求来源或 User-Agent 有校验<br/><br/>
                       建议：<br/>
-                      1. 去对应平台控制台检查 Key 状态和额度<br/>
-                      2. 尝试切换其他提供商测试<br/>
-                      3. 重新生成一个新 Key 再试
+                      1. 尝试在上面填写你的中转站 Base URL<br/>
+                      2. 去对应平台/中转站控制台检查 Key 状态和额度<br/>
+                      3. 尝试切换其他提供商测试
                     </div>
                   </div>
                 )}
