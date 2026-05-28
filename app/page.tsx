@@ -316,6 +316,33 @@ function WordDetailModal({
   // Resets naturally when modal unmounts (new token or close)
   const [addSuccess, setAddSuccess] = useState(false);
 
+  // Naver quick preview (hybrid approach) — loads from our safe defensive route
+  // Falls back silently to the strong "Open in Naver" buttons if data is incomplete or fetch fails
+  const [naverPreview, setNaverPreview] = useState<{
+    loading: boolean;
+    items: any[];
+    fetched: boolean;
+  }>({ loading: false, items: [], fetched: false });
+
+  const loadNaverPreview = useCallback(async () => {
+    if (naverPreview.fetched) return;
+    setNaverPreview((prev) => ({ ...prev, loading: true }));
+
+    try {
+      const res = await fetch(`/api/naver-dict/${encodeURIComponent(token.text)}`);
+      if (!res.ok) throw new Error('fetch failed');
+      const json = await res.json();
+      setNaverPreview({ loading: false, items: json.items || [], fetched: true });
+    } catch {
+      setNaverPreview({ loading: false, items: [], fetched: true });
+    }
+  }, [token.text, naverPreview.fetched]);
+
+  // Auto-load a lightweight preview when the modal opens (server-side cached + very defensive)
+  React.useEffect(() => {
+    loadNaverPreview();
+  }, [loadNaverPreview]);
+
   const handleAdd = async () => {
     try {
       await onAddToLearning(token, context);
@@ -423,6 +450,50 @@ function WordDetailModal({
             </div>
           )}
         </div>
+
+        {/* Naver Quick Preview (lightweight, from our safe api route) + strong CTA buttons */}
+        {naverPreview.fetched && (
+          <div className="word-detail-naver-preview mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] text-[var(--color-text-tertiary)] tracking-wide">Naver 快速预览</span>
+              {naverPreview.loading && (
+                <span className="text-[10px] text-[var(--color-text-muted)] flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" /> 正在获取
+                </span>
+              )}
+            </div>
+
+            {!naverPreview.loading && naverPreview.items.length > 0 && (
+              <div className="space-y-2 text-sm">
+                {naverPreview.items.slice(0, 2).map((item, idx) => (
+                  <div key={idx} className="rounded-lg bg-[var(--color-bg-surface)] p-3 border border-[var(--color-border-subtle)]">
+                    {item.means && item.means.length > 0 && (
+                      <div className="text-[var(--color-text-secondary)]">
+                        {item.means[0]?.value}
+                        {item.means[0]?.partOfSpeech && (
+                          <span className="ml-1.5 text-[10px] text-[var(--color-text-muted)]">· {item.means[0].partOfSpeech}</span>
+                        )}
+                      </div>
+                    )}
+                    {item.examples && item.examples[0] && (
+                      <div className="mt-1.5 text-xs text-[var(--color-text-tertiary)] korean-text">
+                        {item.examples[0].origin}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!naverPreview.loading && naverPreview.items.length === 0 && (
+              <div className="text-xs text-[var(--color-text-muted)]">预览数据暂不可用（已为您准备完整跳转）</div>
+            )}
+
+            <div className="mt-3 text-[10px] text-[var(--color-text-muted)]">
+              预览来自 Naver · 完整词源、汉字讲解与更多例句请点击下方按钮
+            </div>
+          </div>
+        )}
 
         {/* Naver Dictionary deep link — the best way to see rich etymology tags, Hanja visuals & full examples (recommended hybrid approach) */}
         <div className="word-detail-naver-cta mt-4 pt-4 border-t border-[var(--color-border-subtle)]">

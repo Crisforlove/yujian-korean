@@ -838,6 +838,11 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
+/* Naver quick preview block inside modal — calm, secondary information layer */
+.word-detail-naver-preview {
+  font-family: var(--font-sans);
+}
+
 /* Standalone word lookup section */
 .word-lookup-section {
   background: var(--color-bg-elevated);
