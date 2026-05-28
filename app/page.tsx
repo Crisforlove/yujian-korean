@@ -1428,40 +1428,57 @@ export default function SentenceAnalyzerPage() {
     }
   };
 
-  // Standalone word lookup: reuses the analyzer (treats word as input) → extracts primary token → opens detail
-  // This fulfills "simple input that reuses the analyzer" without new endpoints or files.
+  // Standalone word lookup — now supports zero-config mode (pure Naver experience)
+  // With API key: full LLM-powered etymology + grammar (recommended for best quality)
+  // Without API key: direct Naver-focused lookup (buttons + preview). No key required.
   const handleWordLookup = async () => {
     const trimmed = wordLookupInput.trim();
     if (!trimmed) return;
 
     const keyToUse = apiKey.trim();
-    if (!keyToUse) {
-      alert('请先输入 Anthropic API Key 才能使用查词（仅发送至安全 /api/analyze）。');
-      return;
-    }
 
     setIsWordLookupLoading(true);
-    try {
-      // Reuse the exact same secure pipeline. LLM prompt handles single-word gracefully (returns 1 token).
-      const customBase = (provider === 'openai' || provider === 'deepseek') 
-        ? localStorage.getItem(`yujian:baseURL:${provider}`) || undefined 
-        : undefined;
-      const analysis = await analyzeSentenceWithKey(trimmed, keyToUse, provider, selectedModel || undefined, customBase);
 
-      if (analysis.tokens && analysis.tokens.length > 0) {
-        // Open detail using first token + the mini-analysis as context (provides example)
-        openWordDetail(analysis.tokens[0], analysis);
-        setWordLookupInput(''); // clear after successful lookup
-      } else {
-        alert('查词未返回有效词元，请尝试更完整的词或句子分析。');
+    if (keyToUse) {
+      // Full power mode: use LLM for rich structured data
+      try {
+        const customBase = (provider === 'openai' || provider === 'deepseek') 
+          ? localStorage.getItem(`yujian:baseURL:${provider}`) || undefined 
+          : undefined;
+        const analysis = await analyzeSentenceWithKey(trimmed, keyToUse, provider, selectedModel || undefined, customBase);
+
+        if (analysis.tokens && analysis.tokens.length > 0) {
+          openWordDetail(analysis.tokens[0], analysis);
+          setWordLookupInput('');
+        } else {
+          alert('查词未返回有效数据');
+        }
+      } catch (err) {
+        if (err instanceof AnalysisError) {
+          alert(`查词失败：${err.message}`);
+        } else {
+          alert('查词时遇到问题，请检查 Key 或稍后重试。');
+        }
+      } finally {
+        setIsWordLookupLoading(false);
       }
-    } catch (err) {
-      if (err instanceof AnalysisError) {
-        alert(`查词失败：${err.message}`);
-      } else {
-        alert('查词时遇到问题，请检查 Key 或稍后重试。');
-      }
-    } finally {
+    } else {
+      // Zero-config Naver mode: open beautiful modal focused on Naver dictionary
+      // Create a minimal Token so the existing high-quality modal + Naver section works perfectly
+      const fakeToken: Token = {
+        id: `naver-${Date.now()}`,
+        text: trimmed,
+        lemma: trimmed,
+        pos: '',
+        etymology: 'unknown',
+        grammarRole: '',
+        gloss: '',
+        hanja: '',
+      };
+
+      // Open the modal — it already has the very prominent Naver section we built
+      openWordDetail(fakeToken, null);
+      setWordLookupInput('');
       setIsWordLookupLoading(false);
     }
   };
@@ -1907,6 +1924,19 @@ export default function SentenceAnalyzerPage() {
               </button>
             </div>
 
+            {/* Promoted zero-friction entry: Quick word lookup (works without any API key) */}
+            {/* This is now the easiest way to immediately experience the Naver integration */}
+            <div className="mb-6">
+              {/* The word-lookup-section JSX is rendered later in the file for layout reasons, 
+                  but we surface a teaser here when no key is set */}
+              {!apiKey.trim() && (
+                <div className="mb-3 p-3 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-accent-sage)]/40 text-sm">
+                  <div className="font-medium text-[var(--color-accent-sage)] mb-1">想先试试看？</div>
+                  <div className="text-[var(--color-text-secondary)]">下方「快速查词」无需配置任何 Key，输入单词即可直接查看 Naver 最完整的词源与汉字内容。</div>
+                </div>
+              )}
+            </div>
+
             {/* Sentence input */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2 tracking-wide">
@@ -1960,12 +1990,14 @@ export default function SentenceAnalyzerPage() {
               )}
             </div>
 
-            {/* Task 6: Standalone Word Lookup — simple input, reuses analyzer for full etymology + detail */}
-            <div className="word-lookup-section mt-6">
+            {/* Prominent zero-config entry point: Quick word lookup (Naver-focused) */}
+            <div className="word-lookup-section mt-6 border-2 border-[var(--color-accent-sage)]/30 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Search className="w-4 h-4 text-[var(--color-accent-sage)]" />
-                <span className="text-sm font-medium text-[var(--color-text-secondary)] tracking-wide">快速查词</span>
-                <span className="text-[10px] text-[var(--color-text-muted)]">（复用分析器，获得词源与释义）</span>
+                <span className="text-sm font-semibold text-[var(--color-accent-sage)] tracking-wide">快速查词 · 立即使用 Naver 词典</span>
+                {!apiKey.trim() && (
+                  <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-accent-sage)]/10 text-[var(--color-accent-sage)] font-medium">无需 API Key</span>
+                )}
               </div>
               <div className="flex gap-2">
                 <input
@@ -1979,7 +2011,7 @@ export default function SentenceAnalyzerPage() {
                 />
                 <button
                   onClick={handleWordLookup}
-                  disabled={!wordLookupInput.trim() || isWordLookupLoading || !apiKey.trim()}
+                  disabled={!wordLookupInput.trim() || isWordLookupLoading}
                   className="word-lookup-button"
                 >
                   {isWordLookupLoading ? (
@@ -1989,8 +2021,10 @@ export default function SentenceAnalyzerPage() {
                   )}
                 </button>
               </div>
-              <p className="mt-1.5 text-[10px] text-[var(--color-text-muted)]">
-                无需完整句子。查词成功后自动打开详情，可直接「加入我的学习」。
+              <p className="mt-1.5 text-[11px] text-[var(--color-text-secondary)]">
+                {apiKey.trim() 
+                  ? '支持完整词源分析（需 Key）或直接查看 Naver 最强词典内容。' 
+                  : '无需任何配置。直接查看 Naver 词典的完整词源、汉字讲解与例句，可一键加入学习。'}
               </p>
             </div>
 
