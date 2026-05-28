@@ -14,12 +14,15 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 
 import {
   analyzeRequestSchema,
   analyzedSentenceSchema,
   type AnalyzedSentenceSchema,
+  type SupportedProvider,
 } from '@/lib/llm/schema';
 import {
   SYSTEM_PROMPT,
@@ -42,25 +45,22 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-function sanitizeErrorForClient(err: unknown): { message: string; code?: string } {
-  if (err instanceof Anthropic.APIError) {
-    if (err.status === 401 || err.status === 403) {
-      return { message: 'Invalid or unauthorized Anthropic API key.', code: 'INVALID_KEY' };
-    }
-    if (err.status === 429) {
-      return { message: 'Anthropic rate limit exceeded. Please try again later.', code: 'RATE_LIMIT' };
-    }
-    if (err.status && err.status >= 500) {
-      return { message: 'Anthropic service temporarily unavailable.', code: 'UPSTREAM_ERROR' };
-    }
-    return { message: 'Error from Anthropic API.', code: 'ANTHROPIC_ERROR' };
-  }
+function sanitizeErrorForClient(err: unknown, provider: SupportedProvider = 'anthropic'): { message: string; code?: string } {
+  const providerName = provider === 'anthropic' ? 'Anthropic' : 
+                       provider === 'openai' ? 'OpenAI' :
+                       provider === 'gemini' ? 'Gemini' : 'DeepSeek';
 
   if (err instanceof Error) {
-    // Never leak key material
     const msg = err.message.toLowerCase();
-    if (msg.includes('api key') || msg.includes('apikey') || msg.includes('sk-ant')) {
-      return { message: 'There was a problem with the provided API key.', code: 'KEY_ISSUE' };
+
+    if (msg.includes('api key') || msg.includes('apikey') || msg.includes('unauthorized') || msg.includes('invalid key')) {
+      return { message: `Invalid or unauthorized ${providerName} API key.`, code: 'INVALID_KEY' };
+    }
+    if (msg.includes('rate limit') || msg.includes('429')) {
+      return { message: `${providerName} rate limit exceeded. Please try again later.`, code: 'RATE_LIMIT' };
+    }
+    if (msg.includes('service') || msg.includes('unavailable') || msg.includes('500')) {
+      return { message: `${providerName} service temporarily unavailable.`, code: 'UPSTREAM_ERROR' };
     }
     return { message: err.message, code: 'INTERNAL' };
   }
@@ -74,9 +74,10 @@ function sanitizeErrorForClient(err: unknown): { message: string; code?: string 
 
 export async function POST(request: Request) {
   let apiKey: string | undefined;
+  let provider: SupportedProvider = 'anthropic';
 
   try {
-    // 1. Parse & validate request body (never trust client)
+    // 1. Parse & validate request body
     const body = await request.json();
     const parsed = analyzeRequestSchema.safeParse(body);
 
@@ -91,92 +92,31 @@ export async function POST(request: Request) {
       );
     }
 
-    const { sentence, apiKey: providedKey } = parsed.data;
-    apiKey = providedKey; // only in memory for this scope
+    const { sentence, apiKey: providedKey, provider: requestedProvider } = parsed.data;
+    apiKey = providedKey;
+    provider = requestedProvider;
 
-    // 2. Create ephemeral Anthropic client using ONLY the user-supplied key
-    const anthropic = new Anthropic({
-      apiKey: providedKey,
-      // Reasonable timeouts/retries for a grammar analysis call
-      timeout: 60_000,
-      maxRetries: 1,
-    });
+    let finalAnalysis: AnalyzedSentenceSchema;
 
-    // 3. Call Claude with carefully engineered prompts + forced structured tool use
-    const claudeResponse = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 8192,
-      temperature: 0.2, // low temp for factual linguistic analysis
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: buildUserPrompt(sentence),
-        },
-      ],
-      tools: [ANALYSIS_TOOL as unknown as Anthropic.Tool], // schema matches Anthropic.Tool (name + input_schema) — double cast avoids `any` literal
-      tool_choice: {
-        type: 'tool',
-        name: 'analyze_korean_sentence',
-      },
-    });
+    // ========================================================================
+    // Provider dispatch
+    // ========================================================================
 
-    // 4. Extract the forced tool_use result
-    const toolUseBlock = claudeResponse.content.find(
-      (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
-    );
-
-    if (!toolUseBlock) {
+    if (provider === 'anthropic') {
+      finalAnalysis = await callAnthropic(sentence, providedKey);
+    } else if (provider === 'openai' || provider === 'deepseek') {
+      // DeepSeek uses OpenAI-compatible API
+      const baseURL = provider === 'deepseek' 
+        ? 'https://api.deepseek.com' 
+        : undefined;
+      
+      finalAnalysis = await callOpenAICompatible(sentence, providedKey, provider, baseURL);
+    } else if (provider === 'gemini') {
+      finalAnalysis = await callGemini(sentence, providedKey);
+    } else {
       return NextResponse.json(
-        { success: false, error: 'Claude did not return the expected structured analysis.' },
-        { status: 502 }
-      );
-    }
-
-    const rawAnalysis = toolUseBlock.input;
-
-    // 5. Validate + normalize with Zod (the source of truth)
-    const zodResult = analyzedSentenceSchema.safeParse(rawAnalysis);
-
-    if (!zodResult.success) {
-      // Log only safe diagnostic info (never the key)
-      console.error('[analyze/route] Zod validation failed on Claude output', {
-        issues: zodResult.error.issues,
-        sentenceLength: sentence.length,
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'The analysis returned by the model did not match the expected schema.',
-          code: 'VALIDATION_FAILED',
-        },
-        { status: 422 }
-      );
-    }
-
-    const validated = zodResult.data;
-
-    // 6. Server-side normalization (authoritative id, timestamp, original, source)
-    const finalAnalysis: AnalyzedSentenceSchema = {
-      ...validated,
-      id: generateId(),
-      original: sentence, // always trust the actual request input
-      createdAt: nowIso(),
-      source: validated.source || 'user',
-      // ensure optional fields exist as undefined rather than absent for consumers
-      englishTranslation: validated.englishTranslation,
-      chineseTranslation: validated.chineseTranslation,
-      notes: validated.notes,
-    };
-
-    // Final strict validation (belt + suspenders)
-    const finalCheck = analyzedSentenceSchema.safeParse(finalAnalysis);
-    if (!finalCheck.success) {
-      console.error('[analyze/route] Post-normalization validation failed (should never happen)');
-      return NextResponse.json(
-        { success: false, error: 'Internal processing error after analysis.' },
-        { status: 500 }
+        { success: false, error: 'Unsupported provider', code: 'UNSUPPORTED_PROVIDER' },
+        { status: 400 }
       );
     }
 
@@ -184,16 +124,15 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
-        data: finalCheck.data,
+        data: finalAnalysis,
       },
       { status: 200 }
     );
   } catch (err) {
-    const safe = sanitizeErrorForClient(err);
-    // Never log the raw key
+    const safe = sanitizeErrorForClient(err, provider);
     console.error('[analyze/route] Analysis request failed', {
+      provider,
       code: safe.code,
-      // only safe context
       hasKey: !!apiKey,
     });
 
@@ -208,9 +147,113 @@ export async function POST(request: Request) {
       { status }
     );
   } finally {
-    // Explicitly drop any reference (helps in some GC / memory inspection scenarios)
     apiKey = undefined;
   }
+}
+
+// ============================================================================
+// Provider implementations
+// ============================================================================
+
+async function callAnthropic(sentence: string, apiKey: string): Promise<AnalyzedSentenceSchema> {
+  const anthropic = new Anthropic({ apiKey, timeout: 60_000, maxRetries: 1 });
+
+  const response = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 8192,
+    temperature: 0.2,
+    system: SYSTEM_PROMPT,
+    messages: [{ role: 'user', content: buildUserPrompt(sentence) }],
+    tools: [ANALYSIS_TOOL as unknown as Anthropic.Tool],
+    tool_choice: { type: 'tool', name: 'analyze_korean_sentence' },
+  });
+
+  const toolUseBlock = response.content.find(
+    (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
+  );
+
+  if (!toolUseBlock) {
+    throw new Error('Model did not return structured analysis');
+  }
+
+  const validated = analyzedSentenceSchema.parse(toolUseBlock.input);
+  return normalizeAnalysis(validated, sentence);
+}
+
+async function callOpenAICompatible(
+  sentence: string,
+  apiKey: string,
+  provider: 'openai' | 'deepseek',
+  baseURL?: string
+): Promise<AnalyzedSentenceSchema> {
+  const openai = new OpenAI({
+    apiKey,
+    baseURL: baseURL || undefined,
+    timeout: 60_000,
+    maxRetries: 1,
+  });
+
+  const model = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o';
+
+  const completion = await openai.chat.completions.create({
+    model,
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: buildUserPrompt(sentence) },
+    ],
+    response_format: {
+      type: 'json_schema',
+      json_schema: {
+        name: 'analyze_korean_sentence',
+        schema: ANALYSIS_TOOL.input_schema, // reuse the same schema
+      },
+    },
+    temperature: 0.2,
+  });
+
+  const content = completion.choices[0]?.message?.content;
+  if (!content) throw new Error('No response from model');
+
+  const parsed = JSON.parse(content);
+  const validated = analyzedSentenceSchema.parse(parsed);
+  return normalizeAnalysis(validated, sentence);
+}
+
+async function callGemini(sentence: string, apiKey: string): Promise<AnalyzedSentenceSchema> {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    generationConfig: {
+      temperature: 0.2,
+      responseMimeType: 'application/json',
+      responseSchema: ANALYSIS_TOOL.input_schema as any, // Gemini accepts similar schema
+    },
+    systemInstruction: SYSTEM_PROMPT,
+  });
+
+  const result = await model.generateContent(buildUserPrompt(sentence));
+  const text = result.response.text();
+
+  const parsed = JSON.parse(text);
+  const validated = analyzedSentenceSchema.parse(parsed);
+  return normalizeAnalysis(validated, sentence);
+}
+
+// Shared normalization
+function normalizeAnalysis(
+  validated: AnalyzedSentenceSchema,
+  originalSentence: string
+): AnalyzedSentenceSchema {
+  return {
+    ...validated,
+    id: generateId(),
+    original: originalSentence,
+    createdAt: nowIso(),
+    source: validated.source || 'user',
+    englishTranslation: validated.englishTranslation,
+    chineseTranslation: validated.chineseTranslation,
+    notes: validated.notes,
+  };
 }
 
 // Optional: reject other methods explicitly (Next handles 405, but explicit is clearer)

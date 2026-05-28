@@ -7,7 +7,9 @@
  * - Clear labels in both Chinese and English
  */
 
-export type Provider = 'anthropic' | 'openai' | 'gemini' | 'deepseek';
+export type SupportedProvider = 'anthropic' | 'openai' | 'gemini' | 'deepseek';
+
+export type Provider = SupportedProvider; // alias for backward compatibility
 
 export interface ProviderConfig {
   id: Provider;
@@ -58,7 +60,7 @@ export const PROVIDERS: ProviderConfig[] = [
   },
 ];
 
-export function getProviderConfig(provider: Provider): ProviderConfig {
+export function getProviderConfig(provider: SupportedProvider): ProviderConfig {
   const found = PROVIDERS.find((p) => p.id === provider);
   if (!found) {
     throw new Error(`Unknown provider: ${provider}`);
