@@ -832,3 +832,13 @@ e12e852 feat(aesthetic): Subagent 4 — visual elevation for dwell time (paper g
 - 如果你在另一个终端运行 `git log --oneline -10`，应该能看到这些更新。
 
 需要我现在帮你把 WORKLOG.md 和 PROGRESS.md 也提交掉吗？还是继续保持它们作为实时日志文件？
+[2026-05-28 17:53:35] 已提交 WORKLOG.md 和 PROGRESS.md（使 git 历史更干净）
+
+
+[2026-05-28 18:55:00] Git 清理完成
+- 已将 WORKLOG.md 和 PROGRESS.md 提交（db9748f）
+- 原因：让 git 历史更干净，所有优化工作都有清晰的提交记录
+- 未来实时日志仍会继续追加到 WORKLOG.md（用户可继续 tail -f）
+- 当前工作树干净（除非有新改动）
+
+所有 5 个并行子代理的成果现在在 git 历史中清晰可见。
