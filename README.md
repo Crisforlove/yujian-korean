@@ -211,3 +211,26 @@ npm run dev
 | Gemini     | gemini-1.5-flash          | 速度快、免费额度高       |
 | DeepSeek   | deepseek-chat             | 极致性价比               |
 
+
+## 部署
+
+项目已经配置好了一键部署脚本。
+
+### 最简单的方式（推荐）
+
+```bash
+./scripts/deploy.sh
+```
+
+这个脚本会自动：
+1. 提交本地所有改动
+2. 推送到 GitHub
+3. 触发 Vercel 自动部署
+
+### 手动部署
+
+```bash
+git push origin main
+```
+
+然后去 Vercel Dashboard 触发部署即可（推荐关闭 Build Cache 以获得最新代码）。
