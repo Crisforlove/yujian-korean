@@ -24,8 +24,9 @@ export const anthropic = new Anthropic({
 /**
  * Placeholder for the sentence analysis function.
  * Real implementation will come in later tasks.
+ * (Not used by the active MVP flow — see lib/llm/analyzer.ts + /api/analyze)
  */
-export async function analyzeSentence(_korean: string): Promise<unknown> {
+export async function analyzeSentence(): Promise<unknown> {
   // TODO (later tasks): call Claude with carefully engineered prompt
   // for grammar analysis + etymology tagging of every token.
   throw new Error('analyzeSentence not implemented yet (Task 1 scaffolding only)');

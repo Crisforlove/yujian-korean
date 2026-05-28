@@ -1,36 +1,182 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 语见 (Yujian)
 
-## Getting Started
+> **平静而优雅的韩语学习空间**  
+> 为中文母语者设计，专注于**词源洞察**与细腻的阅读体验。  
+> 所有数据与 API Key 严格本地存储，尊重您的隐私与控制权。
 
-First, run the development server:
+---
+
+## 理念
+
+语见（Yujian）源于「语」与「见」——通过语言看见更深层的文化与结构。
+
+我们相信最好的语言学习不是刷题，而是**安静地观察**：每个韩语词元背后的词源故事（固有词 / 汉字词 / 外来词），句子中细微的语法角色，以及中文母语者最需要的自然翻译与例证。
+
+- 治愈系、低饱和度的视觉设计（温暖米色画布 + 优雅留白）
+- 韩语优先的阅读体验（Pretendard 字体 + 精心调优的词元卡片）
+- 词源徽章系统：一目了然地理解词汇来源
+- 本地优先：永远不上传您的句子、笔记或学习历史
+
+---
+
+## 核心功能（MVP 已完整实现）
+
+### 1. 句子智能分析
+- 输入任意韩语句子（支持自然口语与书面语）
+- 使用 **Claude 3.5 Sonnet** 进行高质量结构化拆解
+- 每个 token 展示：表面形式、词典形、词性、**词源徽章**、语法角色、释义、汉字（Sino-Korean）
+- 提供流畅的中文翻译 + 英文翻译 + 整体语法解析与句型说明
+- 分析成功后**自动保存**至本地学习历史
+
+### 2. 单词详情与快速查词
+- 分析结果中的任意词元**可点击**打开优雅详情弹窗
+- 独立快速查词（无需完整句子）
+- 一键「加入我的学习」：持久化保存为 WordEntry（含上下文例句）
+- 支持从详情页直接保存
+
+### 3. 我的学习 / 历史
+- 时间倒序展示所有已分析句子 + 保存的单词
+- 强大筛选系统：
+  - 类型筛选（全部 / 句子 / 单词）
+  - 状态筛选（学习中 / 专注中 / 已掌握）
+  - 词源多选过滤（固有词 / 汉字词 / 外来词）
+  - 日期范围 + 全文搜索（句子原文 + 个人笔记）
+- 标记「已掌握」与「专注」（轻量标签实现）
+- 复习次数自动累计
+- 精美**回放 Modal**：随时重温完整分析快照
+- **一键导出**：同时生成完整 JSON（可导入） + 人类可读的精美 Markdown（中文优先，含词源分布、笔记、语法）
+
+### 4. 设置与数据管理
+- 安全本地 API Key 输入（password 字段，实时保存到 localStorage）
+- 清晰的「如何获取 Anthropic API Key」步骤 + 官方链接
+- 「清除全部我的数据」危险区（带详细确认 + 事务性删除 sentences / history / words + Key）
+- 所有操作完全本地，Key 绝不离开设备（仅在分析请求时通过 HTTPS 短暂发送至 `/api/analyze`，服务端使用后立即丢弃）
+
+### 5. 键盘与无障碍
+- `/` — 在分析页聚焦输入框
+- `Esc` — 关闭任意弹窗（单词详情 / 回放）
+- `?` — 显示快捷键提示
+- 标签页完整键盘导航（方向键、Home/End、roving focus）
+- 响应式设计（手机 / 平板 / 桌面一致优雅体验）
+
+---
+
+## 快速开始
+
+### 前置条件
+- Node.js 18+（推荐 20+）
+- 一个有效的 **Anthropic API Key**
+
+### 1. 获取 Anthropic API Key
+
+1. 访问 [https://console.anthropic.com/](https://console.anthropic.com/)
+2. 使用邮箱注册 / 登录 Anthropic 账户
+3. 进入「API Keys」页面，点击「Create Key」
+4. 复制以 `sk-ant-` 开头的密钥
+5. **免费额度**通常已足够日常学习使用（按 token 计费，极低成本）
+
+> ⚠️ 请妥善保管您的 Key，切勿分享。本应用**完全本地优先**，Key 管理权永远在您手中。
+
+### 2. 安装与运行
 
 ```bash
+git clone <your-repo-url>
+cd yujian
+
+npm install
+# 或 pnpm / yarn / bun
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+在「设置」页粘贴您的 API Key（或直接在分析页顶部提示处输入），即可开始使用。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. 开始学习
 
-## Learn More
+1. 切换到「分析」标签页
+2. 输入一句韩语（如 `오늘 날씨가 정말 좋네요.`）
+3. 点击分析（或按 `Cmd/Ctrl + Enter`）
+4. 点击任意词元查看详情 → 加入学习
+5. 前往「我的学习」浏览、筛选、导出、标记进度
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 技术栈
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **框架**：Next.js 16 (App Router) + React 19 + TypeScript
+- **样式**：Tailwind CSS 4 + 自定义设计令牌（治愈系米色系 + 优雅排版）
+- **AI**：@anthropic-ai/sdk + 教学级 Prompt + 强制结构化 Tool Use + Zod 校验
+- **本地存储**：Dexie (IndexedDB) + localStorage
+- **动画**：Framer Motion（轻量、克制）
+- **图标**：lucide-react
+- **验证**：Zod
 
-## Deploy on Vercel
+架构原则：**单页应用 + 零后端状态**。唯一服务器交互是受严格保护的 `/api/analyze` 路由（key 仅内存短暂存在）。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 部署
+
+本项目为标准 Next.js 应用，可轻松部署到：
+
+- **Vercel**（推荐，一键部署，完美支持）
+- Cloudflare Pages / Netlify（需注意 Edge 运行时限制）
+- 自托管（Docker + nginx 等）
+
+部署时**无需**任何服务器端环境变量（Anthropic Key 完全由用户在客户端提供）。
+
+生产构建已通过验证（`npm run build` 成功）。
+
+---
+
+## 键盘快捷键速查
+
+| 快捷键     | 作用                          | 上下文          |
+|------------|-------------------------------|-----------------|
+| `/`        | 聚焦句子输入框                | 分析页          |
+| `Esc`      | 关闭详情 / 回放弹窗           | 任意弹窗打开时  |
+| `?`        | 显示使用提示                  | 分析页空闲状态  |
+| ← →        | 标签页左右切换                | 任意视图        |
+| Home / End | 切换到第一个 / 最后一个标签页 | 标签页焦点时    |
+
+---
+
+## 已知限制（MVP 阶段）
+
+- 需要用户自备 Anthropic API Key（无内置 key 或代理）
+- 分析依赖网络与 Claude 服务可用性（无离线回退）
+- 历史数据仅存储于当前浏览器（跨设备 / 跨浏览器需手动导出导入 JSON）
+- 暂无 SRS（间隔重复）算法或进度可视化图表（未来可扩展）
+- 词源分类完全依赖 LLM，可能存在极少数边界情况误差
+- 暂不支持批量导入句子或从文件加载
+- 客户端 legacy 存根文件 `lib/llm/client.ts` 保留仅供参考（未使用）
+
+所有限制均已在代码与文档中透明记录。
+
+---
+
+## 未来方向（超出 MVP 范围）
+
+- 更智能的 SRS 复习系统
+- 离线模式 + 本地小模型支持
+- 主题词书 / 例句库扩展
+- 多语言界面（当前优先中文）
+- GitHub 同步导出选项
+
+---
+
+## 致谢与许可
+
+语见使用以下优秀开源项目构建。感谢所有贡献者。
+
+本项目采用 MIT 许可（详见 LICENSE，如有）。
+
+---
+
+**语见 · 让每一次韩语阅读，都成为一次平静的发现。**
+
+如有问题或建议，欢迎通过 GitHub Issues 反馈。
+
+最后更新：2026-05-28（Task 10 最终 MVP 验证完成）
