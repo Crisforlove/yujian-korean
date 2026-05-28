@@ -2397,6 +2397,21 @@ export default function SentenceAnalyzerPage() {
                   （使用 {currentProviderConfig.label}{selectedModel ? ` / ${selectedModel}` : ''}，消耗极少 token）
                 </span>
 
+                {/* 中转站用户重要提示 */}
+                {(provider === 'openai' || provider === 'deepseek') && (
+                  <div className="mt-3 p-3 rounded-lg border border-amber-200 bg-amber-50 text-sm">
+                    <div className="font-medium text-amber-800 mb-1">⚠️ 中转站用户注意事项</div>
+                    <div className="text-amber-700 text-xs leading-relaxed">
+                      很多中转站会主动封锁 Vercel 的服务器 IP，导致 403 错误（即使你的 Key 在其他地方完全正常）。
+                      <br /><br />
+                      <strong>推荐做法：</strong><br />
+                      1. 先在本地运行 <code>npm run dev</code> 测试同一个 Key + Base URL<br />
+                      2. 如果本地能用 → 基本可以确认是 Vercel IP 被封<br />
+                      3. 此时建议改用自建服务器或接受偶尔 403 的情况
+                    </div>
+                  </div>
+                )}
+
                 {/* Custom Base URL for relays (中转站) */}
                 {(provider === 'openai' || provider === 'deepseek') && (
                   <div className="mt-3">
