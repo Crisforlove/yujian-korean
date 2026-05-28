@@ -310,16 +310,24 @@ function WordDetailModal({
   }, [onClose]);
 
   return (
-    <div
+    <motion.div
       className="word-detail-overlay"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="word-detail-title"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={MODAL_SPRING}
     >
-      <div
+      <motion.div
         className="word-detail-modal"
         onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 16, scale: 0.982 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 10, scale: 0.985 }}
+        transition={MODAL_SPRING}
       >
         {/* Modal header */}
         <div className="word-detail-header">
@@ -463,8 +471,8 @@ function WordDetailModal({
         <p className="word-detail-footer-note">
           保存后可在“我的学习”中复习（数据存储于本地 Dexie）。
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -1974,9 +1982,14 @@ export default function SentenceAnalyzerPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs tracking-[0.08em] font-semibold text-[var(--color-text-tertiary)]">分析完成</span>
-                      <span className="save-indicator">
+                      <motion.span
+                        className="save-indicator"
+                        initial={{ opacity: 0, scale: 0.96, x: -4 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        transition={{ type: "spring", stiffness: 380, damping: 26, delay: 0.35 }}
+                      >
                         <Check className="w-3.5 h-3.5" /> 已自动保存至学习历史
-                      </span>
+                      </motion.span>
                     </div>
                     <div className="original-sentence korean-text">{result.original}</div>
                   </div>
@@ -2564,12 +2577,21 @@ export default function SentenceAnalyzerPage() {
         所有数据与密钥严格本地化 · 尊重您的隐私与控制权 · 按 / 聚焦输入 · 方向键导航标签页
       </footer>
 
-      {/* Auto-save toast (sentence) */}
-      {showSavedToast && (
-        <div className="analyzer-toast" role="status">
-          <Check className="w-4 h-4" /> 已自动保存到学习历史
-        </div>
-      )}
+      {/* Auto-save toast (sentence) — upgraded to consistent premium spring + AnimatePresence for calm, purposeful success feedback */}
+      <AnimatePresence>
+        {showSavedToast && (
+          <motion.div
+            className="analyzer-toast"
+            role="status"
+            initial={{ opacity: 0, y: 8, scale: 0.988 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.99 }}
+            transition={{ type: "spring", stiffness: 310, damping: 26, mass: 0.9 }}
+          >
+            <Check className="w-4 h-4" /> 已自动保存到学习历史
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Word saved toast (Task 6) — enhanced with matching premium spring micro-interaction for analyzer context */}
       <AnimatePresence>

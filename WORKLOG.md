@@ -1131,3 +1131,19 @@ To https://github.com/Crisforlove/yujian-korean.git
   后续: 立即提交 + 推送本修复，触发 Vercel 基于最新正确代码的部署。用户刷新后即可看到全部 calm premium + 灵动微交互效果。
 
   状态: 构建已恢复健康。
+
+[2026-05-28 20:48:00] 🎨 最终 calm-premium 收尾打磨（改完后准备重新 push）
+  目标: 在用户“只看效果”前，把所有子代理开启的方向真正收尾到可直接审阅的级别（灵动 + 克制 + 高级纸感 + 有目的成功反馈）。
+
+  执行的 3 处高价值收尾优化：
+  1. 句子分析自动保存 Toast 完全升级为 AnimatePresence + motion.div（与单词保存 Toast 完全一致的 spring 310/26 参数）。去掉老的 CSS keyframe，统一「治愈、不突兀、想停留」的成功反馈质感。
+  2. WordDetailModal（点击词元打开的最重要交互面板）补全 motion 进入/退出动画。overlay + modal 均使用已定义的 MODAL_SPRING（stiffness 260 / damping 30），enter: y+16 + scale 0.982，exit: 温柔回落。之前子代理只做了 Replay Modal，这次让主详情 Modal 也达到同等 premium 物理手感。
+  3. 结果面板里的「已自动保存至学习历史」save-indicator 增加延迟 spring pop（stiffness 380 / damping 26，delay 0.35）。配合 result-panel 整体入场，形成「分析完成 → 自动保存确认」的优雅节奏，不喧闹但有仪式感。
+
+  额外一致性：
+  - 所有弹簧参数继续严格复用/接近现有 TokenCard / History / Skeleton 体系（高 damping 克制 bounce）。
+  - 没有引入新依赖、没有改动业务逻辑、没有新文件。
+
+  质量门禁: 本地 `npm run build` 再次全绿（Compiled successfully + TypeScript 0 error）。
+
+  现在状态: 语法错误已修复 + 所有主要 UI 反馈与 Modal 物理动画已完整打磨。准备干净提交 + 重新 push，触发 Vercel 部署最新「可直接审阅」版本。

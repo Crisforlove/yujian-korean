@@ -240,5 +240,14 @@ Vercel 部署：
 - ✅ 致命部署错误已修复：app/page.tsx:2080 JSX 括号/标签不平衡（motion.div 结果面板被错误闭合为 </div>）
 - 本地 `npm run build` 验证通过（Turbopack 编译成功 + TypeScript 无误 + 静态页面生成）
 - 之前 5 个子代理全部 UI/交互优化（TokenCard、History、成功反馈、诗意空状态、高级纸质质感等）现已可正确部署
-- 即将推送修复 + 触发 Vercel 部署。用户访问线上即可看到完整 calm premium 效果
 - 阻塞解除，后续可继续按计划收尾剩余微交互打磨
+
+[实时更新] 2026-05-28 20:48 — 最终收尾打磨完成（改完后重新 push）
+- 3 处关键 premium polish 已落地：
+  1. 主要自动保存 Toast（句子分析后）升级为 Framer Motion spring + AnimatePresence（与单词保存完全一致的治愈手感）
+  2. WordDetailModal 补全完整 spring enter/exit（使用 MODAL_SPRING，之前只做了 Replay Modal）
+  3. 结果面板 save-indicator 增加优雅延迟 pop 确认动画
+- 所有改动严格克制、高 damping、复用现有弹簧体系 + design tokens
+- `npm run build` 再次 0 错误全通过
+- 现在可以给用户一个「直接审阅、值得停留」的线上版本了
+- 立即 commit + ./scripts/deploy.sh 重新推送
