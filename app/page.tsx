@@ -1047,6 +1047,10 @@ export default function SentenceAnalyzerPage() {
   const [wordLookupInput, setWordLookupInput] = useState('');
   const [isWordLookupLoading, setIsWordLookupLoading] = useState(false);
 
+  // Key test state (for in-Settings feedback)
+  const [isTestingKey, setIsTestingKey] = useState(false);
+  const [keyTestError, setKeyTestError] = useState<string | null>(null);
+
   // ------------------------------------------------------------------------
   // Task 7: My Learning / History view state (integrated single-file view switcher)
   // ------------------------------------------------------------------------
@@ -1140,6 +1144,7 @@ export default function SentenceAnalyzerPage() {
   const updateApiKey = useCallback((value: string) => {
     const trimmed = value.trim();
     setApiKey(trimmed);
+    setKeyTestError(null); // clear previous test result when user changes the key
 
     try {
       if (trimmed.length > 0) {
@@ -1162,6 +1167,7 @@ export default function SentenceAnalyzerPage() {
   // Provider persistence
   const updateProvider = useCallback((newProvider: SupportedProvider) => {
     setProvider(newProvider);
+    setKeyTestError(null); // clear previous test result when switching provider
     try {
       localStorage.setItem('yujian:provider', newProvider);
     } catch {}
@@ -2359,28 +2365,34 @@ export default function SentenceAnalyzerPage() {
                 <button
                   onClick={async () => {
                     if (!apiKey.trim() || !isKeyFormatValid) return;
-                    // Simple test: analyze a very short safe sentence
-                    setIsLoading(true);
-                    setError(null);
-                    setErrorCode(null);
+                    setIsTestingKey(true);
+                    setKeyTestError(null);
                     try {
                       await analyzeSentenceWithKey('안녕하세요.', apiKey.trim(), provider, selectedModel || undefined);
-                      // If no error, consider it success for this test
                       alert('✅ Key 验证通过！可以正常使用。');
                     } catch (e: any) {
-                      const code = e?.code || 'UNKNOWN';
-                      setError(e?.message || 'Key 测试失败');
-                      setErrorCode(code);
+                      const message = e?.message || 'Key 测试失败';
+                      setKeyTestError(message);
                     } finally {
-                      setIsLoading(false);
+                      setIsTestingKey(false);
                     }
                   }}
-                  disabled={!isKeySaved || !isKeyFormatValid || isLoading}
+                  disabled={!isKeySaved || !isKeyFormatValid || isTestingKey}
                   className="text-sm px-4 py-1.5 rounded border border-[var(--color-border)] hover:bg-[var(--color-bg-surface)] disabled:opacity-50"
                 >
-                  测试当前 Key 是否可用
+                  {isTestingKey ? '正在测试...' : '测试当前 Key 是否可用'}
                 </button>
                 <span className="ml-2 text-xs text-[var(--color-text-muted)]">（会消耗少量 token）</span>
+
+                {keyTestError && (
+                  <div className="mt-2 p-3 rounded border border-red-200 bg-red-50 text-sm text-red-700">
+                    {keyTestError}
+                    <div className="mt-1 text-xs">
+                      常见原因：Key 无效 / 没有对应模型权限 / 账户欠费 / Key 格式错误。
+                      请尝试切换提供商或去对应平台重新生成 Key。
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="settings-help-text mt-2">
