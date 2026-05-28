@@ -917,3 +917,4 @@ To https://github.com/Crisforlove/yujian-korean.git
   - History 列表入场是否有 staggered 效果
   - Modal 开关是否有 spring 物理
   - 整体视觉质感是否更高级（纸纹、层次等）
+[2026-05-28 18:11:57] 优化了 API Key 相关的交互体验（403 错误提示、格式校验、测试按钮）
