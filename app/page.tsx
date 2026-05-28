@@ -141,17 +141,18 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
     }
   };
 
-  // Variants for calm, layered spring-driven liveliness (no crazy bounces)
+  // Premium, calm spring-driven interactions (inspired by MagicUI + Josh Comeau style)
+  // Goal: Feels expensive and alive, but still healing and restrained
   const cardVariants = {
     rest: {
       scale: 1,
       y: 0,
-      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.025)',
+      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.025), 0 0 0 1px rgba(0,0,0,0.02)',
     },
     hover: {
-      scale: 1.012,
-      y: -2,
-      boxShadow: '0 10px 22px -6px rgba(47, 44, 39, 0.08), 0 4px 10px -2px rgba(47, 44, 39, 0.05)',
+      scale: 1.015,
+      y: -3,
+      boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 0 1px rgba(127,143,122,0.15)',
     },
     tap: {
       scale: 0.985,
@@ -159,9 +160,9 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
       boxShadow: '0 1px 2px rgba(47, 44, 39, 0.025)',
     },
     focus: {
-      scale: 1.008,
+      scale: 1.01,
       y: -1,
-      boxShadow: '0 4px 12px -2px rgba(47, 44, 39, 0.06)',
+      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.08), 0 0 0 3px rgba(127,143,122,0.2)',
     },
   } as const;
 
@@ -1959,7 +1960,12 @@ export default function SentenceAnalyzerPage() {
 
             {/* Beautiful analysis result (Korean priority throughout) */}
             {result && (
-              <div className="result-panel">
+              <motion.div 
+                className="result-panel"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 120, damping: 25, delay: 0.1 }}
+              >
                 <div className="result-header">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
@@ -2070,24 +2076,39 @@ export default function SentenceAnalyzerPage() {
 
             {/* Poetic empty state — Subagent 4: a calm journal page inviting the first sentence */}
             {!result && !isLoading && !error && (
-              <div className="poetic-empty">
+              <motion.div 
+                className="poetic-empty"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <div className="poetic-empty-content">
-                  <svg width="42" height="42" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="mx-auto">
-                    {/* Delicate open notebook / calm page — minimal line art */}
+                  <motion.svg 
+                    width="42" height="42" 
+                    viewBox="0 0 48 48" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="1.25" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className="mx-auto"
+                    animate={{ opacity: [0.7, 1, 0.7] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
                     <path d="M9 8.5h24a3 3 0 013 3v25.5a3 3 0 01-3 3H9" />
                     <path d="M15 8.5v31" />
                     <path d="M20 15.5h10M20 21h10M20 26.5h7" />
-                    {/* Soft horizon / breath line */}
-                    <path d="M12 35.5c3.5 1.2 8 .8 12.5-1.2" opacity="0.6" />
-                  </svg>
+                    <path d="M12 35.5c3.5 1.2 8 .8 12.5-1.2" opacity="0.5" />
+                  </motion.svg>
                   <div className="poetic-empty-title">
                     纸页轻展。<br />静待第一缕韩语，像晨光落在松针。
                   </div>
                   <div className="poetic-empty-hint">
-                    输入句子并按 <kbd>/</kbd> 聚焦 · Cmd/Ctrl + Enter 分析<br />点击词元探索词源与例句，留下一段自己的学习痕迹
+                    输入句子并按 <kbd>/</kbd> 聚焦 · Cmd/Ctrl + Enter 分析<br />
+                    点击词元探索词源与例句，留下一段自己的学习痕迹
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
           </>
         ) : activeView === 'history' ? (

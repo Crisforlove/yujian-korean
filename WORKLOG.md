@@ -973,3 +973,16 @@ To https://github.com/Crisforlove/yujian-korean.git
 [2026-05-28 19:21:34] 用户要求直接部署最新代码
 🚀 开始部署语见项目...
 📦 添加所有改动...
+💾 提交本地改动...
+[main e67a318] chore: prepare deployment 2026-05-28 19:21
+ 1 file changed, 11 insertions(+)
+⬆️  推送到 GitHub...
+To https://github.com/Crisforlove/yujian-korean.git
+   26d3dc8..e67a318  main -> main
+
+✅ 代码已推送到 GitHub
+
+Vercel 应该会自动开始部署（如果已连接 GitHub）。
+你也可以去 Vercel Dashboard 手动触发最新部署。
+
+部署完成后访问你的 Vercel 域名即可看到最新版本。
