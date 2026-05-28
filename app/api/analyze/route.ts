@@ -53,6 +53,14 @@ function sanitizeErrorForClient(err: unknown, provider: SupportedProvider = 'ant
   if (err instanceof Error) {
     const msg = err.message.toLowerCase();
 
+    // 403 specific handling (common with invalid key / permission issues)
+    if (msg.includes('403') || msg.includes('forbidden')) {
+      return { 
+        message: `${providerName} 返回 403（权限不足或 Key 无效）。请检查：1) Key 是否正确 2) 账户是否有余额/额度 3) 是否已开通该模型权限`, 
+        code: 'INVALID_KEY' 
+      };
+    }
+
     if (msg.includes('api key') || msg.includes('apikey') || msg.includes('unauthorized') || msg.includes('invalid key')) {
       return { message: `Invalid or unauthorized ${providerName} API key.`, code: 'INVALID_KEY' };
     }

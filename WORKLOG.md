@@ -941,3 +941,4 @@ To https://github.com/Crisforlove/yujian-korean.git
 - 触发 GitHub → Vercel 自动部署
 
 用户以后改完代码后，只需要运行这个脚本即可完成部署同步。
+[2026-05-28 18:23:49] 优化了 Key 测试按钮的交互反馈（设置页内直接显示错误）

@@ -2368,7 +2368,8 @@ export default function SentenceAnalyzerPage() {
                     setIsTestingKey(true);
                     setKeyTestError(null);
                     try {
-                      await analyzeSentenceWithKey('안녕하세요.', apiKey.trim(), provider, selectedModel || undefined);
+                      const modelToTest = selectedModel || currentProviderConfig.defaultModel || '';
+                      await analyzeSentenceWithKey('안녕하세요.', apiKey.trim(), provider, modelToTest || undefined);
                       alert('✅ Key 验证通过！可以正常使用。');
                     } catch (e: any) {
                       const message = e?.message || 'Key 测试失败';
@@ -2378,18 +2379,28 @@ export default function SentenceAnalyzerPage() {
                     }
                   }}
                   disabled={!isKeySaved || !isKeyFormatValid || isTestingKey}
-                  className="text-sm px-4 py-1.5 rounded border border-[var(--color-border)] hover:bg-[var(--color-bg-surface)] disabled:opacity-50"
+                  className="text-sm px-4 py-1.5 rounded border border-[var(--color-border)] hover:bg-[var(--color-bg-surface)] disabled:opacity-50 active:scale-[0.985] transition-transform"
                 >
                   {isTestingKey ? '正在测试...' : '测试当前 Key 是否可用'}
                 </button>
-                <span className="ml-2 text-xs text-[var(--color-text-muted)]">（会消耗少量 token）</span>
+                <span className="ml-2 text-xs text-[var(--color-text-muted)]">
+                  （使用 {currentProviderConfig.label}{selectedModel ? ` / ${selectedModel}` : ''}，消耗极少 token）
+                </span>
 
                 {keyTestError && (
-                  <div className="mt-2 p-3 rounded border border-red-200 bg-red-50 text-sm text-red-700">
-                    {keyTestError}
-                    <div className="mt-1 text-xs">
-                      常见原因：Key 无效 / 没有对应模型权限 / 账户欠费 / Key 格式错误。
-                      请尝试切换提供商或去对应平台重新生成 Key。
+                  <div className="mt-2 p-3 rounded border border-red-300 bg-red-50 text-sm text-red-800">
+                    <div className="font-medium mb-1">Key 测试失败（403）</div>
+                    <div>{keyTestError}</div>
+                    <div className="mt-2 text-xs leading-relaxed">
+                      常见原因：<br/>
+                      • Key 无效、过期或权限不足<br/>
+                      • 账户没有余额 / 免费额度已用完<br/>
+                      • 没有开通对应模型的使用权限<br/>
+                      • Key 和当前选择的提供商不匹配<br/><br/>
+                      建议：<br/>
+                      1. 去对应平台控制台检查 Key 状态和额度<br/>
+                      2. 尝试切换其他提供商测试<br/>
+                      3. 重新生成一个新 Key 再试
                     </div>
                   </div>
                 )}
