@@ -103,16 +103,15 @@ export async function POST(request: Request) {
     // ========================================================================
 
     if (provider === 'anthropic') {
-      finalAnalysis = await callAnthropic(sentence, providedKey);
+      finalAnalysis = await callAnthropic(sentence, providedKey, parsed.data.model);
     } else if (provider === 'openai' || provider === 'deepseek') {
-      // DeepSeek uses OpenAI-compatible API
       const baseURL = provider === 'deepseek' 
         ? 'https://api.deepseek.com' 
         : undefined;
       
-      finalAnalysis = await callOpenAICompatible(sentence, providedKey, provider, baseURL);
+      finalAnalysis = await callOpenAICompatible(sentence, providedKey, provider, baseURL, parsed.data.model);
     } else if (provider === 'gemini') {
-      finalAnalysis = await callGemini(sentence, providedKey);
+      finalAnalysis = await callGemini(sentence, providedKey, parsed.data.model);
     } else {
       return NextResponse.json(
         { success: false, error: 'Unsupported provider', code: 'UNSUPPORTED_PROVIDER' },
@@ -155,11 +154,11 @@ export async function POST(request: Request) {
 // Provider implementations
 // ============================================================================
 
-async function callAnthropic(sentence: string, apiKey: string): Promise<AnalyzedSentenceSchema> {
+async function callAnthropic(sentence: string, apiKey: string, model?: string): Promise<AnalyzedSentenceSchema> {
   const anthropic = new Anthropic({ apiKey, timeout: 60_000, maxRetries: 1 });
 
   const response = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: model || 'claude-3-5-sonnet-20241022',
     max_tokens: 8192,
     temperature: 0.2,
     system: SYSTEM_PROMPT,
@@ -184,7 +183,8 @@ async function callOpenAICompatible(
   sentence: string,
   apiKey: string,
   provider: 'openai' | 'deepseek',
-  baseURL?: string
+  baseURL?: string,
+  modelOverride?: string
 ): Promise<AnalyzedSentenceSchema> {
   const openai = new OpenAI({
     apiKey,
@@ -193,7 +193,7 @@ async function callOpenAICompatible(
     maxRetries: 1,
   });
 
-  const model = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o';
+  const model = modelOverride || (provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o');
 
   const completion = await openai.chat.completions.create({
     model,
@@ -219,14 +219,14 @@ async function callOpenAICompatible(
   return normalizeAnalysis(validated, sentence);
 }
 
-async function callGemini(sentence: string, apiKey: string): Promise<AnalyzedSentenceSchema> {
+async function callGemini(sentence: string, apiKey: string, modelOverride?: string): Promise<AnalyzedSentenceSchema> {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: modelOverride || 'gemini-1.5-flash',
     generationConfig: {
       temperature: 0.2,
       responseMimeType: 'application/json',
-      responseSchema: ANALYSIS_TOOL.input_schema as any, // Gemini accepts similar schema
+      responseSchema: ANALYSIS_TOOL.input_schema as any,
     },
     systemInstruction: SYSTEM_PROMPT,
   });

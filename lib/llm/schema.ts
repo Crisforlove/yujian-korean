@@ -131,6 +131,7 @@ export const analyzeRequestSchema = z
       .max(500, 'sentence too long (max 500 chars for analysis)'),
     provider: providerSchema.default('anthropic'),
     apiKey: z.string().min(10, 'API key appears too short').max(200, 'API key too long'),
+    model: z.string().optional(), // optional per-provider model override
   })
   .strict();
 

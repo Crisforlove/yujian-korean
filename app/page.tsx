@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 import { analyzeSentenceWithKey, AnalysisError } from '@/lib/llm/analyzer';
-import { PROVIDERS, DEFAULT_PROVIDER, type SupportedProvider } from '@/lib/llm/providers';
+import { PROVIDERS, DEFAULT_PROVIDER, RECOMMENDED_MODELS, type SupportedProvider } from '@/lib/llm/providers';
 import { 
   addToHistory, 
   saveWordEntry,
@@ -788,9 +788,22 @@ export default function SentenceAnalyzerPage() {
     return DEFAULT_PROVIDER;
   });
 
+  // Selected model (optional override, per provider friendly)
+  const [selectedModel, setSelectedModel] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem('yujian:selectedModel') || '';
+      } catch {
+        return '';
+      }
+    }
+    return '';
+  });
+
   // Derived
   const isKeySaved = apiKey.trim().length > 0;
   const currentProviderConfig = PROVIDERS.find(p => p.id === provider)!;
+  const recommendedModels = RECOMMENDED_MODELS[provider] || [];
 
   // Analysis flow
   const [isLoading, setIsLoading] = useState(false);
@@ -935,6 +948,18 @@ export default function SentenceAnalyzerPage() {
     } catch {}
   }, []);
 
+  const updateSelectedModel = useCallback((model: string) => {
+    const trimmed = model.trim();
+    setSelectedModel(trimmed);
+    try {
+      if (trimmed) {
+        localStorage.setItem('yujian:selectedModel', trimmed);
+      } else {
+        localStorage.removeItem('yujian:selectedModel');
+      }
+    } catch {}
+  }, []);
+
   // ------------------------------------------------------------------------
   // Core analysis handler — wires directly to analyzeSentenceWithKey (Task 4)
   // Auto-saves via history-service (Task 3) on success
@@ -957,7 +982,7 @@ export default function SentenceAnalyzerPage() {
 
     try {
       // Call the secure facade (routes through /api/analyze — key never leaves server scope)
-      const analysis = await analyzeSentenceWithKey(trimmedSentence, keyToUse, provider);
+      const analysis = await analyzeSentenceWithKey(trimmedSentence, keyToUse, provider, selectedModel || undefined);
 
       // Success! Set result immediately for beautiful rendering
       setResult(analysis);
@@ -1081,7 +1106,7 @@ export default function SentenceAnalyzerPage() {
     setIsWordLookupLoading(true);
     try {
       // Reuse the exact same secure pipeline. LLM prompt handles single-word gracefully (returns 1 token).
-      const analysis = await analyzeSentenceWithKey(trimmed, keyToUse);
+      const analysis = await analyzeSentenceWithKey(trimmed, keyToUse, provider, selectedModel || undefined);
 
       if (analysis.tokens && analysis.tokens.length > 0) {
         // Open detail using first token + the mini-analysis as context (provides example)
@@ -1904,6 +1929,45 @@ export default function SentenceAnalyzerPage() {
                   </button>
                 ))}
               </div>
+
+              {/* Recommended Models - quick selection */}
+              {recommendedModels.length > 0 && (
+                <div className="mb-4">
+                  <div className="text-sm font-medium mb-2 text-[var(--color-text-secondary)]">
+                    推荐模型（点击快速选择）
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {recommendedModels.map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => updateSelectedModel(m)}
+                        className={`px-3 py-1 rounded-full text-xs border transition ${
+                          selectedModel === m
+                            ? 'bg-[var(--color-accent-sage)] text-white border-[var(--color-accent-sage)]'
+                            : 'border-[var(--color-border)] hover:bg-[var(--color-bg-surface)]'
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                    {selectedModel && !recommendedModels.includes(selectedModel) && (
+                      <button
+                        onClick={() => updateSelectedModel('')}
+                        className="px-3 py-1 rounded-full text-xs border border-red-300 text-red-600 hover:bg-red-50"
+                      >
+                        清除自定义
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    value={selectedModel}
+                    onChange={(e) => updateSelectedModel(e.target.value)}
+                    placeholder="或输入自定义模型名称（留空使用提供商默认）"
+                    className="mt-2 w-full text-sm px-3 py-2 rounded border border-[var(--color-border)] bg-[var(--color-bg-surface)]"
+                  />
+                </div>
+              )}
 
               {/* Key input - dynamic label & placeholder */}
               <div className="settings-key-wrap">

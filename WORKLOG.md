@@ -568,3 +568,10 @@ branch 'main' set up to track 'origin/main'.
 
 [2026-05-28 17:19:20] 核心开发 + GitHub 上传已全部完成！
   你现在可以直接访问仓库查看代码了。
+[2026-05-28 17:33:27] Multi-provider backend + UI completed and committed
+
+[2026-05-28 17:50:00] 多提供商完整支持 + 推荐模型选择已全部实现
+  - 前端：提供商切换 + 推荐模型快捷按钮 + 自定义模型输入
+  - 后端：Anthropic / OpenAI / DeepSeek / Gemini 全部可用
+  - 模型参数已打通（UI → analyzer → route）
+  - 提交准备中...
