@@ -531,3 +531,20 @@ All 4 required files created. Now: typecheck + commits.
 [2026-05-28 17:18:31] 检查 gh auth status...
 [2026-05-28 17:18:38] gh CLI 已确认登录为 Crisforlove，权限充足（repo 范围）
 [2026-05-28 17:18:38] 准备创建 GitHub 仓库 Crisforlove/yujian-korean 并推送代码...
+[2026-05-28 17:18:38] 正在执行 gh repo create Crisforlove/yujian-korean --public --source=. --remote=origin --push ...
+https://github.com/Crisforlove/yujian-korean
+To https://github.com/Crisforlove/yujian-korean.git
+ * [new branch]      HEAD -> main
+branch 'main' set up to track 'origin/main'.
+
+[2026-05-28 16:51:30] ✅ GitHub 仓库创建并推送成功！
+  仓库地址: https://github.com/Crisforlove/yujian-korean
+  远程已添加: origin → https://github.com/Crisforlove/yujian-korean.git
+  当前分支 main 已推送并跟踪 origin/main
+
+[2026-05-28 16:51:35] 代码已成功上传到 GitHub。
+  接下来准备 Vercel 部署（按用户之前选择的方案 A）。
+
+[2026-05-28 16:51:40] 检查 Vercel CLI 是否可用...
+
+[2026-05-28 17:18:52] Vercel CLI 检查结果已记录
