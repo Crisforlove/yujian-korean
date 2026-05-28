@@ -398,9 +398,9 @@ function WordDetailModal({
             className={`add-learning-button relative ${addSuccess ? 'add-learning-button--success' : ''}`}
             whileTap={!(isAdding || addSuccess) ? { scale: 0.975 } : {}}
             animate={{ 
-              scale: addSuccess ? [1, 1.035, 1.02] : 1,
+              scale: addSuccess ? [1, 1.04, 1.015] : 1,
             }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            transition={{ type: "spring", stiffness: 240, damping: 18 }}
           >
             {/* Tasteful expanding ring — very light, premium, healing (expands softly outward and fades) */}
             <AnimatePresence>
@@ -669,11 +669,11 @@ function HistorySentenceCard({
         delay: entranceDelay,
       }}
       whileHover={{
-        y: -3.5,
-        boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.13), 0 10px 20px -8px rgb(0 0 0 / 0.1)',
-        transition: { type: "spring", stiffness: 340, damping: 24 },
+        y: -4,
+        boxShadow: '0 30px 60px -15px rgb(0 0 0 / 0.15), 0 12px 24px -10px rgb(0 0 0 / 0.11)',
+        transition: { type: "spring", stiffness: 320, damping: 22 },
       }}
-      whileTap={{ scale: 0.983, y: 0.5 }}
+      whileTap={{ scale: 0.98, y: 0.5 }}
     >
       <div className="history-item-meta">
         <span className="history-date">{formatHistoryDate(item.addedAt)}</span>
@@ -799,11 +799,11 @@ function WordBankCard({
         delay: entranceDelay,
       }}
       whileHover={{
-        y: -3.5,
-        boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.13), 0 10px 20px -8px rgb(0 0 0 / 0.1)',
-        transition: { type: "spring", stiffness: 340, damping: 24 },
+        y: -4,
+        boxShadow: '0 30px 60px -15px rgb(0 0 0 / 0.15), 0 12px 24px -10px rgb(0 0 0 / 0.11)',
+        transition: { type: "spring", stiffness: 320, damping: 22 },
       }}
-      whileTap={{ scale: 0.983, y: 0.5 }}
+      whileTap={{ scale: 0.98, y: 0.5 }}
     >
       <div className="flex items-start justify-between gap-3">
         <div>

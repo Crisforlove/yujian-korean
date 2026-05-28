@@ -1060,3 +1060,15 @@ Vercel 应该会自动开始部署（如果已连接 GitHub）。
 所有改动会实时追加到本日志，并持续 commit + push。
 用户可继续 `tail -f yujian/WORKLOG.md` 观察实时进展。
 最终效果由用户部署后自行评判。
+
+[2026-05-28 20:15:00] 持续执行优化（用户要求直接推进）：
+- TokenCard hover 进一步强化（scale 1.025 + y:-6 + 更丰富的 premium 阴影层次）
+- Etymology badge pop 提升到 scale 1.18 + y:-2，更有书卷高级感
+- Token 入场 stagger 参数优化（更优雅的节奏）
+- 成功按钮动画微调
+
+已提交推送（047cd70）
+参考：MagicUI 卡片交互 + Josh Comeau spring 哲学
+目标：让核心的「词素拆解」时刻成为用户真正愿意反复停留、反复点击的体验。
+
+继续并行推进其他方向（History、成功反馈、整体材质、Modal）。
