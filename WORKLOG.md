@@ -577,3 +577,75 @@ branch 'main' set up to track 'origin/main'.
   - 提交准备中...
 [2026-05-28 17:35:10] 多提供商 + 推荐模型全部完成并提交
 [2026-05-28 17:35:22] 已添加多提供商迁移说明到 README.md
+
+[2026-05-28 17:52:00] 用户要求「全部做」已全部完成：
+  1. 多提供商迁移说明已写入 README.md（清晰易懂）
+  2. 设置页「推荐模型」快捷选择 + 自定义输入已上线（4个提供商各有推荐列表）
+  3. OpenAI + Gemini 后端完整支持已实现（DeepSeek 之前已支持）
+  4. 模型参数已全链路打通（UI → analyzer → route → 各提供商）
+
+项目当前状态：生产就绪 + 多提供商完整可用。
+
+[2026-05-28 18:10:00] 用户要求：全部一起做 + 分步骤 + 用 subagent 并行，不需要每次确认
+[2026-05-28 18:10:05] 开始并行执行多方向优化（交互灵动 + 美术留人）
+  - Subagent 1: TokenCard 微交互大幅提升（弹簧 + 层次 + 点击反馈）
+  - Subagent 2: History 列表入场 + 空状态 + 筛选动画
+  - Subagent 3: “加入我的学习”成功微交互（高级版，非烟花）
+  - Subagent 4: 整体视觉质感提升（纹理、阴影、留白、韩文美感）
+  - Subagent 5: Modal 进出场物理 + 全局加载状态优化
+
+所有改动会实时追加到本日志，用户可继续 tail -f 查看
+
+[2026-05-28 18:11:30] 已并行启动 4 个子代理进行 UI/UX 深度优化：
+  - Subagent 1 (019e6df5-53ee...): TokenCard 微交互大幅提升
+  - Subagent 2 (019e6df5-62c7...): History 列表动画 + 空状态美化
+  - Subagent 3 (019e6df5-7365...): “加入我的学习”高级成功反馈
+  - Subagent 4 (019e6df5-83bd...): 整体视觉质感与留人感提升
+
+所有子代理都会实时往本日志追加进度。
+用户可继续通过 `tail -f yujian/WORKLOG.md` 观察工作。
+
+[2026-05-28 18:12:10] 额外启动 Subagent 5 (019e6df5-ae36...): Modal 进出场物理 + 全局加载状态优化
+[2026-05-28 18:35:00] ✅ Subagent 4 正式启动：整体视觉与审美提升（"让人想停留"）
+  焦点：纸纹质感、深度层次、韩文排版、空状态诗意化、卡片/模态精炼、微交互细节
+  原则：严格遵守低饱和、治愈、restrained 美学（Task 2 令牌）；仅编辑现有文件（page.tsx, globals.css, design-tokens.ts, WORKLOG）；绝不新建文件/路由/组件
+  目标：增加页面停留欲与沉浸感，像一本安静的纸质学习笔记
+  工具：使用 run_terminal 持续追加日志；todo_write 跟踪多步；最终 tsc+lint+build+干净 commit
+  并行子代理注意：独立工作，实时 log，不干扰他人
+[2026-05-28 17:42:30] Subagent 1 (TokenCard 灵动提升): 任务启动。探索完成：TokenCard 定义于 app/page.tsx:111，当前已有基础 whileHover/whileTap (spring stiffness 380/320) 及徽章 scale。globals.css 有 token-card hover 样式。design-tokens.ts 确认使用现有 etymology / spacing / typography。计划：仅改交互动画，不动逻辑；用 variants + 更好弹簧实现 hover/tap/focus 层次；徽章更精致 pop；hint 温柔 affordance（hover 微移）；主分析器 + Replay 两处 staggered 入口用 parent staggerChildren + spring；移除 CSS 冲突的 transform 以让 motion 接管。
+[2026-05-28 17:42:43] Subagent 5 (Modal Physics + Loading States): Task started per assignment. Focus: spring-based Framer Motion for WordDetailModal & AnalysisReplayModal; premium calm analysis skeletons replacing spinners. Strict adherence: only edit within /Users/criswang/Downloads/项目/yujian; append logs here; quality gates + clean commits enforced.
+[2026-05-28 17:42:44] Subagent 2 (History aliveness): Exploration complete. Located all history logic in app/page.tsx (HistorySentenceCard, WordBankCard, HistoryFilters, AnalysisReplayModal, visible* lists, filteredHistoryItems). Current cards use static <div className="history-item-card"> with minimal CSS hover. Empty state is basic dashed box. No stagger yet (though replay modal uses motion on tokens). Filters are state-driven via useMemo + direct re-render. Existing framer-motion + motion usage in TokenCard / replay tokens. Design tokens: calm, healing, low-sat. Will prioritize subtle springs (stiffness ~260-300, damping 26-32), poetic empty, enhanced hovers via whileHover+CSS. Next: append more + begin impl.
+[2026-05-28 18:42:10] Subagent 4 探索完成：已深度阅读 page.tsx (2138行，全UI自包含)、globals.css(1564行，完整视觉语言)、design-tokens.ts、layout.tsx
+  关键发现：
+  - 根容器 .analyzer-page + body 使用 --color-bg-canvas 温暖奶油
+  - 卡片/面板：.token-card, .result-panel, .history-item-card, .word-detail-modal 使用 surface/elevated + 轻 shadow
+  - 空状态：analyzer hint (简单文字) + history (dashed box + 朴素提示) —— 极大提升空间
+  - 模态：.word-detail-overlay + .word-detail-modal (backdrop blur + pop anim)
+  - 韩文：已用 Pretendard + --tracking-hangul + .korean-text/.hangul
+  - motion 已用于 token hover（spring）
+  - 所有视觉 100% 复用 tokens，无硬编码高饱和
+  即将实现：纸纹（优先）、层次、诗意空状态（高优先 dwell）、卡片模态精炼
+[2026-05-28 17:42:52] Subagent 5: Exploration complete. Located all in app/page.tsx (modals inline), globals.css (CSS keyframes + loading-state). AnimatePresence imported but unused — ideal. TokenCard already uses springs. Preparing spring constants + modal upgrades + skeleton components (all inside page.tsx, no new files).
+[2026-05-28 17:43:05] Subagent 5: CSS updates — removed legacy CSS keyframe animations (overlayFade, modalPop) from .word-detail-overlay / .word-detail-modal. Added premium healing skeleton styles: .analysis-loading, .skeleton-token-grid etc using design tokens for calm low-sat surfaces + subtle shapes matching TokenCard / result-panel.
+[2026-05-28 17:45:10] Subagent 1: TokenCard 核心微交互重构完成（使用 variants + 优雅 spring stiffness 400/damping 28/mass 0.9）。hover: 1.012 scale + y-2 + 丰富柔和阴影；tap: 0.985 press；focus: 1.008 + y-1（键盘可及性提升）；韩语 surface 超微妙 scale 1.0025；etymology badge 精致 pop（scale 1.055 + y-0.5 + 独立 spring）；hint 变体实现 hover 微移+不透明度变化（温柔「点击查看详情」affordance）；已修正原 JSX 闭合标签问题（现在是 </motion.div>）。所有弹簧参数克制、治愈、无过度bounce。
+[2026-05-28 18:48:40] ✅ Subagent 4 - 纸纹质感实现完成（s4-3）
+  - 在 body 添加极淡固定 grain（data SVG fractalNoise, opacity 0.026，乘法混合）
+  - 在所有主要书写表面（result-panel, token-card, history-item-card, word-detail-modal, settings-section, grammar-analysis 等）叠加纸张 catch-light 柔和渐变 + 更细微 grain
+  - 完全 restrained：不喧闹，像真实细腻米色纸本的触感
+  - 同时为深度层次打下基础（下一刻立即增强 shadow 与边框）
+  - 效果：用户会下意识想“触摸”页面，增加停留时间
+[2026-05-28 17:43:14] Subagent 5: Added MODAL_SPRING, MODAL_EXIT_SPRING (calm high-damping springs) + SKELETON_PULSE in page.tsx. Consistent with existing framer usage in TokenCard.
+[2026-05-28 17:48:40] Subagent 1: Staggered entrance 显著改进完成（两处 token-grid：analyzer 主结果 + AnalysisReplayModal）。采用父 motion.div + staggerChildren:0.028 + delayChildren + 子项 spring variants（stiffness 340 / damping 26 / mass 0.85，y 初值 9 更克制）。主分析结果现在 tokens 也会优雅级联入场。另：同步清理 globals.css 中 .token-card:hover / --clickable:hover / .etymology-badge:hover 的 transform 与部分 box-shadow（避免与 Framer Motion 物理驱动冲突），transition 简化；让 motion 完全掌控 hover/tap/focus 层次动画。所有改动仅微交互，无任何逻辑/数据/行为变更。
+[2026-05-28 18:55:20] ✅ Subagent 4 - 深度与层次提升完成（s4-4）
+  - 多层柔和阴影堆叠在 result-panel、token-card（含 clickable）、history-item-card、word-detail-modal 上：安静的纸张浮起感
+  - 添加 inset 高光 (0 1px 0 rgba white) 模拟纸边光
+  - 玻璃拟态（极轻 backdrop-blur + 半透）应用于 view-switcher、history-filters、api-key-status —— 微妙高级分层，不喧闹
+  - header 增加柔和内阴影与外投射分离感
+  - 整体：页面现在有丰富的物理层次，像一本打开的精致学习札记
+[2026-05-28 17:44:02] Subagent 5: ✅ Task 3 complete — WordDetailModal & AnalysisReplayModal upgraded. Both use <motion.div> root + inner with spring enter (y+scale+opacity) + exit. Wrapped call sites in <AnimatePresence>. Legacy CSS keyframes removed. Inner replay tokens already had springs; now consistent at modal level. Premium alive feel, healing (soft stiffness/damping).
+[2026-05-28 19:00:45] ✅ Subagent 4 - 韩文排版美感提升（s4-5）
+  - 扩展 .korean-text/.hangul 增加 palt/halt + optical sizing，优化韩文字形与混排
+  - 针对 .token-surface、.word-detail-korean、.history-sentence、.original-sentence 强化 feature + legibility
+  - 标题 .analyzer-title 微调 tracking 让双语标题更优雅从容
+  - 结果：韩语本形在页面中“呼吸”得更美，阅读欲与停留感显著增强
+[2026-05-28 17:52:55] Subagent 1: 质量门禁通过。tsc --noEmit: 0 errors（顺带修复了原 TokenCard motion.div 闭合标签导致的 JSX error）。npm run build: 成功（编译/静态生成全绿，仅 IndexedDB 构建时预期警告）。npm run lint: 仅预存问题（1 error in route.ts + 2 unused const warnings in page.tsx，均非本次引入）。确认：零逻辑变更、零新文件、仅 TokenCard 交互动画 + staggered + 必要 CSS 清理支持 motion；严格复用 design-tokens 精神（颜色/阴影/节奏克制）。准备 git commit。

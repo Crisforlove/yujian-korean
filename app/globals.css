@@ -163,16 +163,65 @@ a:hover {
   max-width: 72ch;
 }
 
-/* Korean / mixed-script specific refinements */
+/* Korean / mixed-script specific refinements — enhanced for dwell & beauty */
 .korean-text,
 .hangul {
-  font-feature-settings: "kern" 1, "tnum" 0;
+  font-feature-settings: "kern" 1, "tnum" 0, "palt" 1, "halt" 1;
+  font-optical-sizing: auto;
+}
+
+/* Elevated Hangul presence in key surfaces (titles, cards, modals) — quiet hierarchy */
+.token-surface,
+.word-detail-korean,
+.history-sentence,
+.original-sentence {
+  font-feature-settings: "kern" 1, "tnum" 0, "palt" 1;
+  letter-spacing: var(--tracking-hangul);
+  text-rendering: optimizeLegibility;
 }
 
 /* Selection — soft, warm, never harsh */
 ::selection {
   background-color: #e5e0d5;
   color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   Subagent 4: Subtle Paper Texture & Tactile Depth (restrained, healing)
+   Very faint grain on canvas only — like soft washi or fine notebook paper.
+   Increases material presence and desire to linger, without visual noise.
+   Applied to body + key writing surfaces. Low opacity, multiply blend.
+   ========================================================================== */
+
+/* Very subtle paper grain (self-contained data URI, no external asset) */
+body {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='0.026'/%3E%3C/svg%3E");
+  background-size: 210px 210px;
+  background-attachment: fixed;
+}
+
+/* Paper catch-light + soft tooth on primary surfaces (adds quiet premium depth) */
+.analyzer-page,
+.result-panel,
+.token-card,
+.history-item-card,
+.word-detail-modal,
+.settings-section,
+.word-lookup-section,
+.word-detail-hanja-block,
+.grammar-analysis {
+  background-image: 
+    linear-gradient(152deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.06) 38%, rgba(0,0,0,0.011) 82%, rgba(0,0,0,0.022) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 165px 165px;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat;
+  background-attachment: local, local;
+}
+
+/* Slightly stronger tactile on true "page" surfaces */
+.analyzer-page {
+  background-size: 100% 100%, 195px 195px;
 }
 
 /* ==========================================================================
@@ -224,10 +273,9 @@ a:hover {
   border-color: var(--etymology-unknown-border);
 }
 
-/* Subtle hover for interactivity (future sentence analyzer) */
+/* Subtle hover for interactivity (future sentence analyzer) — transform removed to avoid conflict with motion.span whileHover pop inside TokenCard */
 .etymology-badge:hover {
   filter: brightness(0.985);
-  transform: translateY(-0.5px);
 }
 
 /* ==========================================================================
@@ -276,12 +324,13 @@ a:hover {
   padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--color-border-subtle);
   background: linear-gradient(to bottom, var(--color-bg-elevated), var(--color-bg-canvas));
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.5) inset, 0 4px 12px -6px rgba(47,44,39,0.04);
 }
 
 .analyzer-title {
   font-size: var(--text-2xl);
   font-weight: 600;
-  letter-spacing: var(--tracking-tight);
+  letter-spacing: -0.025em; /* slightly tighter for elegant bilingual title presence */
   color: var(--color-text-primary);
 }
 
@@ -401,7 +450,11 @@ a:hover {
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.75rem;
   padding: 1.75rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  /* Enhanced paper depth: soft multi-layer lift + distant ambient (restrained) */
+  box-shadow: 
+    0 1px 2px rgba(47,44,39,0.028),
+    0 4px 14px -2px rgba(47,44,39,0.045),
+    0 12px 32px -10px rgba(47,44,39,0.035);
 }
 
 .result-header {
@@ -494,16 +547,17 @@ a:hover {
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.5625rem;
   padding: 0.875rem 1rem 0.9375rem;
-  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  transition: box-shadow 160ms ease, border-color 120ms ease; /* transform removed: Framer Motion now drives all interactive lift/shadow via spring variants for TokenCard */
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
+  /* Quiet paper elevation */
+  box-shadow: 0 1px 1px rgba(47,44,39,0.022), 0 3px 9px -1px rgba(47,44,39,0.032);
 }
 
 .token-card:hover {
   border-color: var(--color-border-default);
-  box-shadow: 0 3px 8px rgba(47, 44, 39, 0.045);
-  transform: translateY(-0.5px);
+  /* box-shadow & transform removed here — motion variants (hover/tap/focus) provide richer spring-physics shadows & lifts for clickable cards; non-clickable still get base + this border */
 }
 
 .token-surface {
@@ -582,6 +636,73 @@ a:hover {
   font-size: var(--text-sm);
 }
 
+/* ==========================================================================
+   Premium calm loading skeletons — healing aesthetic
+   Alive, serene, low-contrast pulse. No harsh spinners for analysis states.
+   Uses subtle motion in JSX + soft surfaces matching design tokens.
+   ========================================================================== */
+
+.analysis-loading {
+  padding: 1.5rem 1.25rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.analysis-loading-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.skeleton-sentence {
+  height: 1.75rem;
+  background: var(--color-bg-subtle);
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  width: 92%;
+}
+
+.skeleton-translation {
+  height: 1.125rem;
+  background: var(--color-bg-subtle);
+  border-radius: 0.25rem;
+  margin-bottom: 0.625rem;
+  width: 78%;
+}
+
+.skeleton-token-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 0.625rem;
+  margin-top: 1rem;
+}
+
+.skeleton-token {
+  height: 72px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.5625rem;
+}
+
+.history-loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.skeleton-history-item {
+  height: 68px;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.5rem;
+}
+
 /* Error state — soft, never alarming */
 .error-card {
   background: #fdf8f3;
@@ -646,8 +767,7 @@ a:hover {
 
 .token-card--clickable:hover {
   border-color: var(--color-accent-sage);
-  box-shadow: 0 4px 14px rgba(47, 44, 39, 0.07);
-  transform: translateY(-1px);
+  /* transform + previous box-shadow removed: fully delegated to Framer Motion whileHover/whileFocus variants (spring 400/28) on TokenCard root for superior 灵动 yet restrained feel */
 }
 
 .token-card--clickable:focus-visible {
@@ -727,12 +847,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  animation: overlayFade 120ms ease forwards;
-}
-
-@keyframes overlayFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  /* Animation now driven by Framer Motion spring physics (premium calm enter/exit) */
 }
 
 .word-detail-modal {
@@ -743,20 +858,12 @@ a:hover {
   max-width: 520px;
   max-height: 92vh;
   overflow: auto;
-  box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.18),
-              0 8px 24px -8px rgba(0, 0, 0, 0.1);
-  animation: modalPop 160ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@keyframes modalPop {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  box-shadow: 
+    0 2px 4px rgba(47,44,39,0.06),
+    0 12px 32px -6px rgba(47,44,39,0.12),
+    0 28px 70px -18px rgba(47,44,39,0.16),
+    0 1px 0 0 rgba(255,255,255,0.65) inset;
+  /* Animation now driven by Framer Motion spring physics (premium calm enter/exit) */
 }
 
 .word-detail-header {
@@ -920,6 +1027,12 @@ a:hover {
   cursor: not-allowed;
 }
 
+/* Premium calm success state for "加入我的学习" — subtle permanent glow, no gamification */
+.add-learning-button--success {
+  box-shadow: 0 0 0 5px rgba(127, 143, 122, 0.13);
+  /* Keep same sage; the glow + drawn check + label change deliver the quiet satisfaction */
+}
+
 .word-detail-secondary {
   padding: 0 1.25rem;
   font-size: var(--text-sm);
@@ -971,11 +1084,13 @@ a:hover {
 /* View switcher tabs in header — restrained, pill-like */
 .view-switcher {
   display: inline-flex;
-  background: var(--color-bg-subtle);
+  background: rgba(241, 238, 231, 0.82); /* subtle glass over paper */
   border: 1px solid var(--color-border-subtle);
   border-radius: 9999px;
   padding: 3px;
   gap: 2px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 3px rgba(47,44,39,0.04), 0 1px 0 rgba(255,255,255,0.6) inset;
 }
 .view-tab {
   display: inline-flex;
@@ -1033,11 +1148,22 @@ a:hover {
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.75rem;
   padding: 1rem 1.125rem 0.875rem;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: border-color 160ms cubic-bezier(0.23, 1, 0.32, 1), 
+              box-shadow 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  /* Paper card base elevation */
+  box-shadow: 0 1px 1px rgba(47,44,39,0.02), 0 3px 8px -1px rgba(47,44,39,0.03);
+  /* Note: transform & interactive lift handled by framer-motion whileHover/whileTap for spring feel */
 }
 .history-item-card:hover {
   border-color: var(--color-border-default);
-  box-shadow: 0 2px 6px rgba(47, 44, 39, 0.035);
+  box-shadow: 
+    0 1px 2px rgba(47,44,39,0.028),
+    0 8px 22px -2px rgba(47,44,39,0.065),
+    0 18px 40px -14px rgba(47,44,39,0.045);
+}
+.history-item-card:active {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 1px 4px rgba(47, 44, 39, 0.07);
 }
 .word-bank-card {
   background: var(--color-bg-elevated);
@@ -1132,7 +1258,7 @@ a:hover {
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 110ms ease;
+  transition: all 140ms cubic-bezier(0.23, 1, 0.32, 1);
   height: 2rem;
 }
 .history-action-btn:hover:not(:disabled) {
@@ -1157,6 +1283,15 @@ a:hover {
   background: #f8f0ee;
   border-color: #c9a9a3;
 }
+
+/* Gentle replay button arrow animation — calm, inviting (Task for history aliveness) */
+.history-action-btn.ml-auto .replay-arrow {
+  display: inline-block;
+  transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.history-action-btn.ml-auto:hover .replay-arrow {
+  transform: translateX(2.5px);
+}
 .history-action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -1164,10 +1299,12 @@ a:hover {
 
 /* Filters toolbar — quiet, generous */
 .history-filters {
-  background: var(--color-bg-elevated);
+  background: rgba(250, 248, 243, 0.78);
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.625rem;
   padding: 0.875rem 1rem 0.75rem;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 1px 2px rgba(47,44,39,0.025);
 }
 .history-filters-row {
   display: flex;
@@ -1201,7 +1338,7 @@ a:hover {
   background: var(--color-bg-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 100ms ease;
+  transition: all 140ms cubic-bezier(0.23, 1, 0.32, 1);
   white-space: nowrap;
 }
 .filter-pill:hover {
@@ -1275,12 +1412,13 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  background: var(--color-bg-subtle);
+  background: rgba(241, 238, 231, 0.75);
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.5rem;
   padding: 0.5rem 0.875rem;
   margin-bottom: 1.5rem;
   font-size: 0.8125rem;
+  backdrop-filter: blur(4px);
 }
 .api-key-manage-link {
   margin-left: auto;

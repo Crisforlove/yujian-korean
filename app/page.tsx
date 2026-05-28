@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Send, 
   Loader2, 
@@ -47,6 +48,30 @@ const ETYMOLOGY_LABELS: Record<EtymologyTag, string> = {
   'sino-korean': '汉字词',
   loanword: '外来词',
   unknown: '未分类',
+};
+
+/** Calm spring physics for premium modal enter/exit — healing aesthetic, alive yet serene.
+ *  Matches & extends existing TokenCard springs (stiffness ~260-380, high damping).
+ *  Never linear or abrupt; physics feel premium and "alive".
+ */
+const MODAL_SPRING = {
+  type: "spring" as const,
+  stiffness: 260,
+  damping: 30,
+  mass: 0.95,
+};
+
+const MODAL_EXIT_SPRING = {
+  type: "spring" as const,
+  stiffness: 300,
+  damping: 32,
+  mass: 0.85,
+};
+
+/** Gentle looping pulse for skeleton elements — subtle life without distraction */
+const SKELETON_PULSE = {
+  opacity: [0.55, 0.92, 0.55],
+  transition: { duration: 1.8, repeat: Infinity, ease: [0.42, 0, 0.58, 1] as const },
 };
 
 function getEtymologyBadgeClass(etymology: EtymologyTag): string {
@@ -122,8 +147,53 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
     }
   };
 
+  // Variants for calm, layered spring-driven liveliness (no crazy bounces)
+  const cardVariants = {
+    rest: {
+      scale: 1,
+      y: 0,
+      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.025)',
+    },
+    hover: {
+      scale: 1.012,
+      y: -2,
+      boxShadow: '0 10px 22px -6px rgba(47, 44, 39, 0.08), 0 4px 10px -2px rgba(47, 44, 39, 0.05)',
+    },
+    tap: {
+      scale: 0.985,
+      y: 0,
+      boxShadow: '0 1px 2px rgba(47, 44, 39, 0.025)',
+    },
+    focus: {
+      scale: 1.008,
+      y: -1,
+      boxShadow: '0 4px 12px -2px rgba(47, 44, 39, 0.06)',
+    },
+  } as const;
+
+  const hintVariants = {
+    rest: { opacity: 0.72, x: 0 },
+    hover: { opacity: 1, x: 1.5 },
+    tap: { opacity: 0.85, x: 0 },
+    focus: { opacity: 0.95, x: 0.5 },
+  } as const;
+
+  const surfaceVariants = {
+    rest: { scale: 1 },
+    hover: { scale: 1.0025 },
+    tap: { scale: 0.998 },
+    focus: { scale: 1.001 },
+  } as const;
+
   return (
-    <div
+    <motion.div
+      variants={cardVariants}
+      initial="rest"
+      animate="rest"
+      whileHover={isClickable ? "hover" : undefined}
+      whileTap={isClickable ? "tap" : undefined}
+      whileFocus={isClickable ? "focus" : undefined}
+      transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.9 }}
       className={`token-card ${isClickable ? 'token-card--clickable' : ''}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
@@ -131,8 +201,13 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
       tabIndex={isClickable ? 0 : undefined}
       aria-label={isClickable ? `查看「${token.text}」单词详情` : undefined}
     >
-      {/* Korean surface form — visual priority */}
-      <div className="token-surface hangul korean-text">{token.text}</div>
+      {/* Korean surface form — visual priority, ultra-subtle lift on interaction */}
+      <motion.div
+        className="token-surface hangul korean-text"
+        variants={surfaceVariants}
+      >
+        {token.text}
+      </motion.div>
 
       {/* Lemma (dictionary form) when different */}
       {hasLemma && (
@@ -141,9 +216,18 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
 
       {/* Meta row: etymology badge (Task 2) + POS */}
       <div className="token-meta">
-        <span className={getEtymologyBadgeClass(token.etymology)}>
+        <motion.span
+          className={getEtymologyBadgeClass(token.etymology)}
+          whileHover={{
+            scale: 1.055,
+            y: -0.5,
+            transition: { type: "spring", stiffness: 450, damping: 20 },
+          }}
+          whileTap={{ scale: 0.96 }}
+          transition={{ type: "spring", stiffness: 380, damping: 22 }}
+        >
           {ETYMOLOGY_LABELS[token.etymology]}
-        </span>
+        </motion.span>
         <span className="token-pos">{token.pos}</span>
       </div>
 
@@ -162,10 +246,17 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
         <div className="token-hanja">{token.hanja}</div>
       )}
 
+      {/* Gentle "click to see details" affordance — responds to card hover state via variants */}
       {isClickable && (
-        <div className="token-click-hint">点击查看详情 →</div>
+        <motion.div
+          className="token-click-hint"
+          variants={hintVariants}
+          transition={{ type: "spring", stiffness: 320, damping: 24 }}
+        >
+          点击查看详情 →
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -200,8 +291,18 @@ function WordDetailModal({
       ]
     : [];
 
+  // Local success state for premium micro-interaction on the "加入我的学习" button
+  // Resets naturally when modal unmounts (new token or close)
+  const [addSuccess, setAddSuccess] = useState(false);
+
   const handleAdd = async () => {
-    await onAddToLearning(token, context);
+    try {
+      await onAddToLearning(token, context);
+      setAddSuccess(true);
+      // Modal intentionally stays open (per existing design) so user sees calm confirmation on button itself
+    } catch {
+      // Parent already handles error surfacing (alert + console); no additional noise here
+    }
   };
 
   // ESC to close (good UX, standard for modals)
@@ -214,16 +315,24 @@ function WordDetailModal({
   }, [onClose]);
 
   return (
-    <div
+    <motion.div
       className="word-detail-overlay"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="word-detail-title"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div
+      <motion.div
         className="word-detail-modal"
         onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 18, scale: 0.982 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 14, scale: 0.985 }}
+        transition={MODAL_SPRING}
       >
         {/* Modal header */}
         <div className="word-detail-header">
@@ -296,21 +405,67 @@ function WordDetailModal({
 
         {/* Actions */}
         <div className="word-detail-actions">
-          <button
+          <motion.button
             onClick={handleAdd}
-            disabled={isAdding}
-            className="add-learning-button"
+            disabled={isAdding || addSuccess}
+            className={`add-learning-button relative ${addSuccess ? 'add-learning-button--success' : ''}`}
+            whileTap={!(isAdding || addSuccess) ? { scale: 0.975 } : {}}
+            animate={{ scale: addSuccess ? 1.005 : 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 24 }}
           >
-            {isAdding ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" /> 正在加入学习…
-              </>
-            ) : (
-              <>
-                <Plus className="w-4 h-4" /> 加入我的学习
-              </>
-            )}
-          </button>
+            {/* Tasteful expanding ring — very light, premium, healing (expands softly outward and fades) */}
+            <AnimatePresence>
+              {addSuccess && (
+                <motion.div
+                  key="success-ring"
+                  className="absolute inset-[-3px] rounded-[9999px] pointer-events-none z-0"
+                  style={{ border: '1.75px solid rgba(127, 143, 122, 0.30)' }}
+                  initial={{ scale: 0.62, opacity: 0.72 }}
+                  animate={{ scale: 1.62, opacity: 0 }}
+                  transition={{ duration: 0.68, ease: [0.23, 1, 0.32, 1] }}
+                />
+              )}
+            </AnimatePresence>
+
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              {isAdding ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> 正在加入学习…
+                </>
+              ) : addSuccess ? (
+                <>
+                  {/* Subtle hand-drawn checkmark with spring-friendly draw timing — calm & satisfying */}
+                  <motion.svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="shrink-0"
+                  >
+                    <motion.path
+                      d="M20 6L9 17L4 12"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ 
+                        duration: 0.42, 
+                        ease: [0.22, 1, 0.36, 1],
+                        delay: 0.07 
+                      }}
+                    />
+                  </motion.svg>
+                  已加入我的学习
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" /> 加入我的学习
+                </>
+              )}
+            </span>
+          </motion.button>
           <button onClick={onClose} className="word-detail-secondary">
             关闭
           </button>
@@ -319,8 +474,8 @@ function WordDetailModal({
         <p className="word-detail-footer-note">
           保存后可在“我的学习”中复习（数据存储于本地 Dexie）。
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -349,15 +504,23 @@ function AnalysisReplayModal({
   }, [onClose]);
 
   return (
-    <div
+    <motion.div
       className="word-detail-overlay history-replay-overlay"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div
+      <motion.div
         className="word-detail-modal history-replay-modal"
         onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 18, scale: 0.982 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 14, scale: 0.985 }}
+        transition={MODAL_SPRING}
       >
         <div className="word-detail-header">
           <div>
@@ -414,11 +577,36 @@ function AnalysisReplayModal({
               <span>词素拆解 · Morpheme Breakdown</span>
               <span className="text-[var(--color-text-muted)] font-normal">（{s.tokens.length} 个词元）</span>
             </div>
-            <div className="token-grid">
+            {/* Improved staggered entrance with spring physics + parent staggerChildren for 灵动 yet calm reveal */}
+            <motion.div
+              className="token-grid"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.028,
+                    delayChildren: 0.04,
+                  },
+                },
+              }}
+            >
               {s.tokens.map((token) => (
-                <TokenCard key={token.id} token={token} />
+                <motion.div
+                  key={token.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 9 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { type: 'spring', stiffness: 340, damping: 26, mass: 0.85 },
+                    },
+                  }}
+                >
+                  <TokenCard token={token} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </>
         )}
 
@@ -446,8 +634,8 @@ function AnalysisReplayModal({
         <div className="pt-4 mt-2 flex justify-end">
           <button onClick={onClose} className="word-detail-secondary">关闭回放</button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -459,6 +647,7 @@ function HistorySentenceCard({
   onDelete,
   onReplay,
   isProcessing,
+  entranceDelay = 0,
 }: {
   item: HistoryItem;
   onMarkMastered: (id: string) => void;
@@ -466,6 +655,7 @@ function HistorySentenceCard({
   onDelete: (id: string) => void;
   onReplay: (item: HistoryItem) => void;
   isProcessing: boolean;
+  entranceDelay?: number;
 }) {
   const status = getItemStatus(item);
   const etyms = getEtymologiesInSentence(item.sentence);
@@ -479,7 +669,22 @@ function HistorySentenceCard({
   };
 
   return (
-    <div className="history-item-card">
+    <motion.div
+      className="history-item-card"
+      initial={{ opacity: 0, y: 7 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 265,
+        damping: 28,
+        delay: entranceDelay,
+      }}
+      whileHover={{
+        y: -1.5,
+        transition: { type: "spring", stiffness: 420, damping: 30 },
+      }}
+      whileTap={{ scale: 0.987, y: 0.5 }}
+    >
       <div className="history-item-meta">
         <span className="history-date">{formatHistoryDate(item.addedAt)}</span>
         <div className="flex items-center gap-2">
@@ -502,13 +707,18 @@ function HistorySentenceCard({
         </div>
       </div>
 
-      <div 
+      <motion.div 
         className="history-sentence korean-text cursor-pointer hover:underline decoration-[var(--color-accent-sage)]/40" 
         onClick={() => onReplay(item)}
         title="点击查看完整分析回放"
+        whileHover={{ 
+          x: 1,
+          transition: { type: "spring", stiffness: 380, damping: 26 }
+        }}
+        whileTap={{ x: 0 }}
       >
         {item.sentence.original}
-      </div>
+      </motion.div>
 
       {item.sentence.chineseTranslation && (
         <div className="history-translation text-[var(--color-text-secondary)]">
@@ -562,10 +772,10 @@ function HistorySentenceCard({
           onClick={() => onReplay(item)}
           className="history-action-btn ml-auto"
         >
-          查看分析 →
+          查看分析 <span className="replay-arrow">→</span>
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -574,10 +784,12 @@ function WordBankCard({
   word,
   onDelete,
   isProcessing,
+  entranceDelay = 0,
 }: {
   word: WordEntry;
   onDelete: (id: string) => void;
   isProcessing: boolean;
+  entranceDelay?: number;
 }) {
   const handleDelete = () => {
     if (confirm(`确认从单词库删除「${word.word}」？`)) {
@@ -586,7 +798,22 @@ function WordBankCard({
   };
 
   return (
-    <div className="history-item-card word-bank-card">
+    <motion.div
+      className="history-item-card word-bank-card"
+      initial={{ opacity: 0, y: 7 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 265,
+        damping: 28,
+        delay: entranceDelay,
+      }}
+      whileHover={{
+        y: -1.5,
+        transition: { type: "spring", stiffness: 420, damping: 30 },
+      }}
+      whileTap={{ scale: 0.987, y: 0.5 }}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="history-sentence korean-text text-[1.25rem]">{word.word}</div>
@@ -618,7 +845,7 @@ function WordBankCard({
           <Trash2 className="w-3.5 h-3.5" /> 删除
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -1648,11 +1875,50 @@ export default function SentenceAnalyzerPage() {
               </p>
             </div>
 
-            {/* Loading indicator */}
+            {/* Premium calm analysis loading skeleton — alive, healing, no harsh spinner.
+                Mimics upcoming result-panel + token grid with soft spring pulses. */}
             {isLoading && (
-              <div className="loading-state mt-6">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Claude 正在进行形态拆解与词源标注（通常 4–9 秒）…</span>
+              <div className="analysis-loading mt-6">
+                <div className="analysis-loading-header">
+                  <span>正在进行形态拆解与词源标注</span>
+                  <span className="text-[10px] opacity-60">（通常 4–9 秒）</span>
+                </div>
+
+                {/* Skeleton of the result sentence header */}
+                <motion.div 
+                  className="skeleton-sentence" 
+                  animate={SKELETON_PULSE} 
+                />
+
+                {/* Skeleton translations */}
+                <motion.div 
+                  className="skeleton-translation" 
+                  style={{ width: '82%' }} 
+                  animate={SKELETON_PULSE} 
+                  transition={{ ...SKELETON_PULSE.transition, delay: 0.12 }} 
+                />
+                <motion.div 
+                  className="skeleton-translation" 
+                  style={{ width: '61%' }} 
+                  animate={SKELETON_PULSE} 
+                  transition={{ ...SKELETON_PULSE.transition, delay: 0.22 }} 
+                />
+
+                {/* Calm skeleton token grid — feels like the morpheme breakdown coming to life */}
+                <div className="skeleton-token-grid">
+                  {[0,1,2,3,4,5].map((i) => (
+                    <motion.div 
+                      key={i} 
+                      className="skeleton-token" 
+                      animate={SKELETON_PULSE}
+                      transition={{ ...SKELETON_PULSE.transition, delay: 0.08 * (i % 3) }}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-3 text-[10px] text-[var(--color-text-muted)] tracking-wide text-center">
+                  正在安静地理解韩语句子的结构与词源…
+                </div>
               </div>
             )}
 
@@ -1741,15 +2007,39 @@ export default function SentenceAnalyzerPage() {
                       <span className="text-[var(--color-text-muted)] font-normal">（{result.tokens.length} 个词元）</span>
                     </div>
 
-                    <div className="token-grid">
+                    {/* Improved staggered entrance (spring + parent stagger) — tokens now gracefully cascade in after analysis with tasteful liveliness */}
+                    <motion.div
+                      className="token-grid"
+                      initial="hidden"
+                      animate="visible"
+                      variants={{
+                        visible: {
+                          transition: {
+                            staggerChildren: 0.028,
+                            delayChildren: 0.04,
+                          },
+                        },
+                      }}
+                    >
                       {result.tokens.map((token) => (
-                        <TokenCard 
-                          key={token.id} 
-                          token={token} 
-                          onClick={(t) => openWordDetail(t, result)} 
-                        />
+                        <motion.div
+                          key={token.id}
+                          variants={{
+                            hidden: { opacity: 0, y: 9 },
+                            visible: {
+                              opacity: 1,
+                              y: 0,
+                              transition: { type: 'spring', stiffness: 340, damping: 26, mass: 0.85 },
+                            },
+                          }}
+                        >
+                          <TokenCard 
+                            token={token} 
+                            onClick={(t) => openWordDetail(t, result)} 
+                          />
+                        </motion.div>
                       ))}
-                    </div>
+                    </motion.div>
 
                     <p className="mt-3 text-[10px] text-[var(--color-text-muted)] tracking-wide">
                       每张卡片突出韩语本形，词源徽章（固有词 / 汉字词 / 外来词）。<strong>点击任意卡片</strong>打开单词详情（释义、例句、加入学习）。
@@ -1820,11 +2110,20 @@ export default function SentenceAnalyzerPage() {
               filteredCount={filteredTotal}
             />
 
-            {/* Loading */}
+            {/* Calm history loading skeleton — consistent premium feel */}
             {isHistoryLoading && (
-              <div className="loading-state mt-8">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>正在载入学习历史…</span>
+              <div className="history-loading-skeleton mt-4">
+                {[0,1,2].map((i) => (
+                  <motion.div 
+                    key={i} 
+                    className="skeleton-history-item" 
+                    animate={SKELETON_PULSE}
+                    transition={{ ...SKELETON_PULSE.transition, delay: i * 0.09 }}
+                  />
+                ))}
+                <div className="text-center text-[10px] text-[var(--color-text-muted)] mt-1 tracking-wide">
+                  正在从本地 Dexie 取回你的学习记录…
+                </div>
               </div>
             )}
 
@@ -1836,7 +2135,7 @@ export default function SentenceAnalyzerPage() {
                   <div className="mt-6">
                     <div className="history-section-label">句子记录（最新在前）</div>
                     <div className="history-list">
-                      {visibleSentences.map((item) => (
+                      {visibleSentences.map((item, index) => (
                         <HistorySentenceCard
                           key={item.id}
                           item={item}
@@ -1845,6 +2144,7 @@ export default function SentenceAnalyzerPage() {
                           onDelete={handleDeleteHistory}
                           onReplay={openReplay}
                           isProcessing={historyProcessingId === item.id}
+                          entranceDelay={index * 0.038}
                         />
                       ))}
                     </div>
@@ -1856,12 +2156,13 @@ export default function SentenceAnalyzerPage() {
                   <div className="mt-8">
                     <div className="history-section-label">单词库</div>
                     <div className="history-list word-list">
-                      {visibleWords.map((word) => (
+                      {visibleWords.map((word, index) => (
                         <WordBankCard
                           key={word.id}
                           word={word}
                           onDelete={handleDeleteWord}
                           isProcessing={historyProcessingId === word.id}
+                          entranceDelay={index * 0.038}
                         />
                       ))}
                     </div>
@@ -2081,12 +2382,21 @@ export default function SentenceAnalyzerPage() {
         </div>
       )}
 
-      {/* Word saved toast (Task 6) */}
-      {showWordSavedToast && (
-        <div className="analyzer-toast word-toast" role="status">
-          <Check className="w-4 h-4" /> 已加入我的学习
-        </div>
-      )}
+      {/* Word saved toast (Task 6) — enhanced with matching premium spring micro-interaction for analyzer context */}
+      <AnimatePresence>
+        {showWordSavedToast && (
+          <motion.div
+            className="analyzer-toast word-toast"
+            role="status"
+            initial={{ opacity: 0, y: 8, scale: 0.988 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.99 }}
+            transition={{ type: "spring", stiffness: 310, damping: 26, mass: 0.9 }}
+          >
+            <Check className="w-4 h-4" /> 已加入我的学习
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* History action toast (Task 7) */}
       {showHistoryToast && (
@@ -2095,21 +2405,27 @@ export default function SentenceAnalyzerPage() {
         </div>
       )}
 
-      {/* Word Detail Modal (Task 6) — rendered at root level for proper overlay */}
-      {selectedDetail && (
-        <WordDetailModal
-          token={selectedDetail.token}
-          context={selectedDetail.context}
-          onClose={closeWordDetail}
-          onAddToLearning={handleAddToLearning}
-          isAdding={isAddingToLearning}
-        />
-      )}
+      {/* Word Detail Modal (Task 6) — rendered at root level for proper overlay.
+          AnimatePresence + spring motion now powers premium enter/exit physics (calm, alive). */}
+      <AnimatePresence>
+        {selectedDetail && (
+          <WordDetailModal
+            token={selectedDetail.token}
+            context={selectedDetail.context}
+            onClose={closeWordDetail}
+            onAddToLearning={handleAddToLearning}
+            isAdding={isAddingToLearning}
+          />
+        )}
+      </AnimatePresence>
 
-      {/* History Replay Modal (Task 7) — beautiful full-snapshot viewer */}
-      {replayItem && (
-        <AnalysisReplayModal item={replayItem} onClose={closeReplay} />
-      )}
+      {/* History Replay Modal (Task 7) — beautiful full-snapshot viewer.
+          Now with spring-based exit that feels premium and healing. */}
+      <AnimatePresence>
+        {replayItem && (
+          <AnalysisReplayModal item={replayItem} onClose={closeReplay} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
