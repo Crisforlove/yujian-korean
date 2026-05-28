@@ -918,3 +918,26 @@ To https://github.com/Crisforlove/yujian-korean.git
   - Modal 开关是否有 spring 物理
   - 整体视觉质感是否更高级（纸纹、层次等）
 [2026-05-28 18:11:57] 优化了 API Key 相关的交互体验（403 错误提示、格式校验、测试按钮）
+
+[2026-05-28 19:30:00] 部署尝试：
+- 已将最新代码（包含 403 错误优化 + Test Key 按钮 + 多提供商改进）推送到 GitHub: c41e997
+- 尝试使用 npx vercel --prod 直接部署 → 失败（Vercel token 无效，需要 `vercel login`）
+- 无法在此环境中直接部署到 Vercel（无有效 token）
+
+建议用户操作：
+1. 去 Vercel Dashboard → 找到 yujian-korean 项目
+2. 在 Deployments 里找到 commit c41e997 或最新的一次
+3. 点击 Redeploy（务必关闭 "Use existing Build Cache"）
+4. 或者本地执行 `vercel login` 后再 `vercel --prod`
+
+
+[2026-05-28 19:35:00] 创建了一键部署脚本 scripts/deploy.sh
+用法：
+  ./scripts/deploy.sh
+
+功能：
+- 自动 git add + commit（如果有改动）
+- 自动 git push origin main
+- 触发 GitHub → Vercel 自动部署
+
+用户以后改完代码后，只需要运行这个脚本即可完成部署同步。
