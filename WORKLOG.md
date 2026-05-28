@@ -198,3 +198,81 @@ All 4 required files created. Now: typecheck + commits.
 - 视觉：完全匹配治愈系设计令牌与徽章系统，ESC 关闭、toast 反馈、加载态等
 - 下一动作：追加最终日志 + 创建一个干净的原子提交
 [2026-05-28 18:25:10] 准备最终提交：git add 仅 app/page.tsx app/globals.css WORKLOG.md（精确范围）。Commit 将原子描述 Task 6 完整交付。
+
+[2026-05-28 16:28:00] ✅ Task 6 子代理执行完成
+  Status: DONE (213秒, 62 tool calls)
+  Subagent ID: 019e6daf-2b0a-7f50-9cd3-57506a606e2a
+
+[2026-05-28 16:28:05] Task 6 核心交付:
+  - Token 可点击：analyzer 里的 token 支持 onClick，打开单词详情 modal
+  - WordDetailModal：优雅居中弹窗
+    • 大韩文表面形式 + 词源徽章（完全复用 Task 2）
+    • Hanja 块（汉字词突出）
+    • 释义 + 语法角色
+    • 示例（来自分析上下文）
+    • “加入我的学习”按钮 → saveWordEntry 到 Dexie
+  - 独立快速查词区：输入单词 → 复用 analyzer → 打开相同 modal
+  - 所有样式追加到 globals.css，严格使用 Task 2 设计令牌
+
+[2026-05-28 16:28:10] Git 提交:
+  - 97c40f7 feat(word-detail): implement Task 6 - Word Detail & Lookup
+    (3 files, +746/-12)
+
+[2026-05-28 16:28:15] 验证通过: tsc clean, lint clean, npm run build 成功
+
+[2026-05-28 16:28:20] 下一动作: 启动 Task 7 子代理（我的学习 / 历史页面）
+  目标: 历史时间线 + 筛选 + 标记掌握 + 导出
+
+[2026-05-28 16:28:45] ✅ Task 7 子代理已启动
+  ID: 019e6db2-c2f0-7a72-99d4-8ba3509690a5
+  目标: 我的学习 / 历史页面（时间线 + 筛选 + 标记 + 导出）
+  状态: 后台执行中...
+
+[2026-05-28 16:28:50] 你应该能在 tail -f 里持续看到更新...
+[2026-05-28 18:30:00] ✅ Task 7 正式启动：我的学习 / 历史页面 (My Learning / History Page)
+- 严格范围：仅编辑 app/page.tsx、app/globals.css、WORKLOG.md（绝不新建文件/目录/路由）
+- 目标：时间倒序优雅列表 + 筛选（日期、词源类型、句子vs单词、状态） + 单项操作（标记掌握/专注/删除） + 全量导出（JSON + 精美 Markdown）
+- 架构：单页内 View Switcher（分析器 / 我的学习）tab，复用现有数据层 (history-service + db)
+- 使用 Task 2 治愈设计令牌 + etymology badges
+- 先追加日志，阅读现有实现细节后用 search_replace 精准实现
+
+[2026-05-28 18:32:10] 设计决策确认（严格遵循前序子代理纪律）：
+- 不创建任何新文件：History 作为 page.tsx 内 "analyzer" | "history" 视图切换实现（state: activeView）
+- 后期 Task 9 会处理正式路由拆分
+- 主要数据：HistoryItem[] (句子，时间倒序) + WordEntry[] (单词库)
+- 筛选实现：混合使用 history-service.getHistory (date/tag/search) + 客户端二次过滤 (etymology 存在性, sentence/word 类型, status derived from tags)
+- 单词无时间戳，使用字母排序；状态筛选对单词退化为全部显示
+- 操作：仅 HistoryItem 支持 markMastered / markFocus / unmark / delete ；单词仅 delete
+- 导出：浏览器 Blob 下载 learning-history.json + learning-history.md (结构化、带词源徽章描述、优雅格式)
+- 详情：点击历史句子项可打开 "AnalysisReplayModal" 展示完整快照（复用 token grid + 语法 + 翻译，零新文件）
+- 视觉：100% 复用 design tokens + 新 .history-* 规则追加到 globals.css ，低饱和、留白、韩语优先
+- 质量：完成后执行 tsc --noEmit / eslint / build 验证
+
+[2026-05-28 18:35:20] 开始代码实现：第一步准备编辑 app/page.tsx （导入 + 类型 + 常量）
+即将使用 search_replace 添加 History 相关 service 导入、lucide 图标、HistoryItem 类型。所有变更精确匹配。
+
+[2026-05-28 18:36:40] ✅ 完成导入更新：添加了 useEffect、History/Download 等图标 + 完整 history-service 方法 + HistoryItem 类型。
+[2026-05-28 18:38:05] ✅ 插入 Task 7 纯辅助函数（日期格式化、词源聚合、状态推导）。为 History 筛选与列表提供基础。
+[2026-05-28 18:40:50] ✅ 插入 Task 7 核心 UI 组件：AnalysisReplayModal、HistorySentenceCard、WordBankCard、HistoryFilters。优雅、零依赖新文件。
+[2026-05-28 18:43:30] ✅ 完成状态、加载器、筛选逻辑、动作处理器 + 全量导出（JSON + 精美结构化 Markdown）。使用现有服务方法。
+[2026-05-28 18:48:10] ✅ JSX 视图切换 + 历史主内容区 + 导出 + 回放模态 + 动作 toast 全部就位。page.tsx 实现完成（仅编辑现有文件）。下一步追加 CSS。
+[2026-05-28 18:50:25] ✅ 全部历史样式追加到 globals.css（view-switcher、history-item-card、filters、action-btn、toast 等）。完全基于 Task 2 令牌与徽章系统，治愈低饱和美学。
+
+[2026-05-28 18:58:40] ✅ Task 7 全部交付完成（严格范围）
+- 仅编辑：app/page.tsx + app/globals.css + WORKLOG.md（使用 echo 追加日志）
+- 完整实现：
+  • 页内优雅 View Switcher（分析句子 ↔ 我的学习）
+  • 时间倒序优雅列表（HistorySentenceCard + WordBankCard）
+  • 完整筛选：类型（句子/单词/全部）、状态（全部/已掌握/专注/学习中）、词源多选（OR）、日期范围、搜索
+  • 单项操作：标记掌握（markHistoryAsMastered）、设为专注/取消（add/remove focus tag）、删除（deleteHistoryItem / deleteWordEntry）
+  • 全量导出：一键同时下载美观 JSON（完整快照）+ 结构化中文优先 Markdown（带词源、状态、笔记、语法）
+  • AnalysisReplayModal：点击记录回放完整分析（复用 TokenCard + 翻译 + 语法）
+  • 100% 复用 Task 3 history-service + db + types；Task 2 design-tokens + etymology-badge-*
+  • 视觉：低饱和、留白、韩语优先、与现有 analyzer 完全一致的治愈美学
+- 质量门禁：
+  • npx tsc --noEmit : 0 errors
+  • npx eslint app/page.tsx : 0 errors (1 warning fixed)
+  • npm run build : ✓ Compiled successfully (生产就绪)
+- 范围纪律：零新文件、零新路由、零新依赖、零 data layer 修改
+- 下一阶段准备：Task 8 设置页 / Task 9 导航路由拆分
+
