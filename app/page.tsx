@@ -1018,6 +1018,12 @@ export default function SentenceAnalyzerPage() {
   const currentProviderConfig = PROVIDERS.find(p => p.id === provider)!;
   const recommendedModels = RECOMMENDED_MODELS[provider] || [];
 
+  const isKeyFormatValid = (() => {
+    const key = apiKey.trim();
+    if (!key) return false;
+    return key.startsWith(currentProviderConfig.keyPrefix);
+  })();
+
   // Analysis flow
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalyzedSentence | null>(null);
@@ -1677,23 +1683,29 @@ export default function SentenceAnalyzerPage() {
     window.setTimeout(() => setShowHistoryToast(null), 2200);
   };
 
-  // Friendly error messages per code (from analyzer + route)
+  // Friendly error messages per code + current provider
   const getErrorGuidance = (code: string | null): string => {
     if (!code) return '';
+
+    const providerName = currentProviderConfig.label;
+
     switch (code) {
       case 'MISSING_KEY':
+        return `请在「设置」中输入有效的 ${providerName} API Key。`;
       case 'INVALID_KEY':
-        return '请确认 API Key 格式正确（sk-ant-...），且 Anthropic 账户有可用额度。';
+        return `API Key 无效或无权限（${providerName}）。请检查 Key 是否正确、是否有额度，并确认已开通对应模型权限。`;
       case 'RATE_LIMIT':
-        return '服务请求过多，请稍等 30 秒后再试。';
+        return `${providerName} 请求过于频繁，请稍等 30 秒后再试。`;
       case 'INVALID_INPUT':
         return '请输入有效的韩语句子。';
+      case 'KEY_ISSUE':
+        return `提供的 ${providerName} API Key 有问题，请重新检查或更换 Key。`;
       default:
-        return '如持续失败，请检查网络或稍后再试。';
+        return `分析失败（${providerName}）。请检查网络、Key 权限，或稍后再试。`;
     }
   };
 
-  const canAnalyze = sentenceInput.trim().length > 0 && apiKey.trim().length > 0 && !isLoading;
+  const canAnalyze = sentenceInput.trim().length > 0 && isKeySaved && isKeyFormatValid && !isLoading;
 
   // ------------------------------------------------------------------------
   // Render — elegant, calm, Korean-centric experience
@@ -1911,14 +1923,23 @@ export default function SentenceAnalyzerPage() {
             {/* Error display — soft and actionable */}
             {error && (
               <div className="error-card mt-6" role="alert">
-                <AlertCircle className="icon w-4 h-4" />
-                <div>
+                <AlertCircle className="icon w-4 h-4 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
                   <div className="font-medium mb-0.5">分析失败</div>
                   <div>{error}</div>
                   {errorCode && (
                     <div className="mt-1 text-xs opacity-75">
                       {getErrorGuidance(errorCode)}
                     </div>
+                  )}
+
+                  {(errorCode === 'INVALID_KEY' || errorCode === 'MISSING_KEY' || errorCode === 'KEY_ISSUE') && (
+                    <button
+                      onClick={() => setActiveView('settings')}
+                      className="mt-2 text-sm text-[var(--color-accent-sage)] underline hover:no-underline"
+                    >
+                      前往「设置」检查或更换 {currentProviderConfig.label} Key →
+                    </button>
                   )}
                 </div>
               </div>
@@ -2305,7 +2326,7 @@ export default function SentenceAnalyzerPage() {
                   value={apiKey}
                   onChange={(e) => updateApiKey(e.target.value)}
                   placeholder={`${currentProviderConfig.keyPlaceholder} （仅本地保存）`}
-                  className="settings-key-input"
+                  className={`settings-key-input ${apiKey && !isKeyFormatValid ? 'border-red-400 focus:border-red-500' : ''}`}
                   autoComplete="off"
                   spellCheck={false}
                 />
@@ -2326,6 +2347,40 @@ export default function SentenceAnalyzerPage() {
                     </button>
                   )}
                 </div>
+              </div>
+
+              {apiKey && !isKeyFormatValid && (
+                <div className="mt-2 text-sm text-red-600">
+                  当前 Key 格式与所选提供商不匹配（应以 <code>{currentProviderConfig.keyPrefix}</code> 开头）
+                </div>
+              )}
+
+              <div className="mt-3">
+                <button
+                  onClick={async () => {
+                    if (!apiKey.trim() || !isKeyFormatValid) return;
+                    // Simple test: analyze a very short safe sentence
+                    setIsLoading(true);
+                    setError(null);
+                    setErrorCode(null);
+                    try {
+                      await analyzeSentenceWithKey('안녕하세요.', apiKey.trim(), provider, selectedModel || undefined);
+                      // If no error, consider it success for this test
+                      alert('✅ Key 验证通过！可以正常使用。');
+                    } catch (e: any) {
+                      const code = e?.code || 'UNKNOWN';
+                      setError(e?.message || 'Key 测试失败');
+                      setErrorCode(code);
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  disabled={!isKeySaved || !isKeyFormatValid || isLoading}
+                  className="text-sm px-4 py-1.5 rounded border border-[var(--color-border)] hover:bg-[var(--color-bg-surface)] disabled:opacity-50"
+                >
+                  测试当前 Key 是否可用
+                </button>
+                <span className="ml-2 text-xs text-[var(--color-text-muted)]">（会消耗少量 token）</span>
               </div>
 
               <div className="settings-help-text mt-2">
