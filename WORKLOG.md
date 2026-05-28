@@ -94,3 +94,54 @@ All 4 required files created. Now: typecheck + commits.
   - Key security contract fully implemented in route + analyzer
 
 [2026-05-28 16:33:25] Task 4 complete. Ready for integration in later tasks (UI will call analyzeSentenceWithKey).
+
+[2026-05-28 16:19:35] ✅ Task 4 子代理执行完成
+  Status: DONE (237秒, 66 tool calls)
+  Subagent ID: 019e6da7-3294-7d13-968b-cf6abb65e05b
+
+[2026-05-28 16:19:40] Task 4 交付内容:
+  - lib/llm/schema.ts: Zod schemas (etymology, Token, AnalyzedSentence, analyzeRequest)
+  - lib/llm/prompt.ts: 高质量 SYSTEM_PROMPT + buildUserPrompt + ANALYSIS_TOOL (针对中文母语者)
+  - app/api/analyze/route.ts: 安全 Next.js Route Handler (ephemeral key, 严格验证, 错误脱敏)
+  - lib/llm/analyzer.ts: 客户端 facade + AnalysisError + 优雅降级
+
+[2026-05-28 16:19:45] 代码提交:
+  - 386f428: feat(llm): implement Task 4 - Claude LLM Analysis Service (secure)
+  - 394b46b: chore(worklog): append Task 4 completion details
+
+[2026-05-28 16:19:50] 验证通过: TypeScript clean, ESLint clean (目标文件), 安全策略严格遵守 (key 从不持久化/返回/日志)
+
+[2026-05-28 16:19:55] 下一动作: 更新 PROGRESS.md + 启动 Task 5 子代理 (句子分析器核心页面)
+
+[2026-05-28 16:20:10] PROGRESS.md 已实时更新（Task 4 完成标记 + 下一任务预告）
+
+[2026-05-28 16:20:15] 即将启动 Task 5 子代理（句子分析器核心页面）
+  目标: 实现句子输入 + 结果展示 + 调用 analyzeSentenceWithKey
+  预计: 5-12 分钟
+
+[2026-05-28 16:20:20] 你现在应该能在 tail -f 里看到持续更新...
+
+[2026-05-28 16:20:35] ✅ Task 5 子代理已启动
+  ID: 019e6dab-5554-78f1-8b6f-e794dffc8f7d
+  目标: 句子分析器核心页面（输入 + 美丽结果展示 + 调用 analyzer + 自动保存）
+  状态: 后台执行中...
+
+[2026-05-28 16:20:40] 日志持续更新中，你应该能通过 tail -f 看到我一直在工作。
+[2026-05-28 17:05:00] ✅ Task 5 正式启动：句子分析器核心页面 (Core Experience)
+[2026-05-28 17:05:10] 严格范围：仅编辑现有文件（app/page.tsx, app/globals.css, layout.tsx 如需微调）+ WORKLOG。绝不新建组件文件或超出核心输入+结果UI。
+[2026-05-28 17:05:20] 前置：已完整阅读 AGENTS.md、Next.js App Router 官方 docs (client components, fetching, layouts, error-handling) + 回顾 Task2/3/4 所有交付（design-tokens, etymology CSS, Dexie+history-service, analyzer.ts）。
+[2026-05-28 17:05:30] 计划：用 "use client" 在 page.tsx 构建自包含分析器；优雅 API Key（localStorage，client-only）；美丽 token cards（韩语优先，复用 .etymology-badge-*）；成功后调用 addToHistory 自动保存；使用设计令牌与治愈美学。
+[2026-05-28 17:05:40] 将使用 run_terminal echo 持续追加关键进度。
+[2026-05-28 17:08:45] ✅ 已向 globals.css 追加 Task 5 专用分析器样式（使用全部设计令牌 + etymology badges，韩语优先 token-card 精美实现，治愈美学）。
+[2026-05-28 17:22:10] ✅ Task 5 核心实现完成：句子输入 + 美丽分析结果 UI 已上线。
+[2026-05-28 17:22:20] 交付要点（严格遵循原计划范围）：
+  - app/page.tsx 完全替换为自包含 "use client" 分析器页面（未新建任何文件）
+  - 直接调用 analyzeSentenceWithKey (来自 lib/llm/analyzer.ts) + 完整错误码处理
+  - 成功后立即通过 addToHistory 自动保存到 Dexie（同时存 sentence + HistoryItem）
+  - 完整复用 Task 2 设计令牌 + etymology-badge-* 徽章系统
+  - TokenCard 韩语优先：surface 21px 粗体、徽章、词典形、语法角色、gloss、hanja 精美呈现
+  - API Key 本地保存（localStorage），仅用于 /api 安全调用，UI 友好提示
+  - 加载、错误（含具体指导）、保存 toast、Cmd+Enter 快捷键、优雅清空体验
+[2026-05-28 17:22:30] 质量门禁：tsc --noEmit ✓ 0 错误；eslint app/page.tsx ✓ 0 错误（已修复 setState-in-effect 及 unused import）
+[2026-05-28 17:22:40] 视觉：所有样式使用 CSS 变量 + 治愈系低饱和配色，token-grid 响应式，卡片 hover 微妙动效。
+[2026-05-28 17:22:50] 范围纪律：仅编辑 page.tsx + globals.css（追加分析器样式）+ WORKLOG.md。无新组件、无 settings 页、无历史列表页。
