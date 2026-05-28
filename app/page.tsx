@@ -141,9 +141,8 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
     }
   };
 
-  // Highly refined, premium spring interactions (inspired by MagicUI + Josh Comeau + premium language tools)
-  // Feels expensive, alive, and deeply satisfying while staying calm and healing.
-  // Stronger hover lift + layered shadows for tactile "premium paper" feel.
+  // Premium, alive yet restrained spring interactions (MagicUI + Josh Comeau + premium language tool references)
+  // Goal: expensive tactile feel with breathing life, while staying deeply calm and healing.
   const cardVariants = {
     rest: {
       scale: 1,
@@ -151,34 +150,34 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
       boxShadow: '0 1px 2px rgba(47, 44, 39, 0.03), 0 0 0 1px rgba(0,0,0,0.025)',
     },
     hover: {
-      scale: 1.022,
-      y: -5,
-      boxShadow: '0 30px 60px -15px rgb(0 0 0 / 0.14), 0 12px 24px -10px rgb(0 0 0 / 0.1), 0 0 0 1px rgba(127,143,122,0.22)',
+      scale: 1.025,
+      y: -6,
+      boxShadow: '0 35px 70px -18px rgb(0 0 0 / 0.16), 0 14px 28px -12px rgb(0 0 0 / 0.11), 0 0 0 1px rgba(127,143,122,0.25)',
     },
     tap: {
-      scale: 0.98,
+      scale: 0.978,
       y: 0,
       boxShadow: '0 1px 2px rgba(47, 44, 39, 0.03)',
     },
     focus: {
-      scale: 1.014,
-      y: -2.5,
-      boxShadow: '0 14px 28px -10px rgb(0 0 0 / 0.12), 0 0 0 3px rgba(127,143,122,0.28)',
+      scale: 1.016,
+      y: -3,
+      boxShadow: '0 16px 32px -12px rgb(0 0 0 / 0.14), 0 0 0 3.5px rgba(127,143,122,0.32)',
     },
   } as const;
 
   const hintVariants = {
-    rest: { opacity: 0.72, x: 0 },
-    hover: { opacity: 1, x: 1.5 },
-    tap: { opacity: 0.85, x: 0 },
-    focus: { opacity: 0.95, x: 0.5 },
+    rest: { opacity: 0.65, x: 0 },
+    hover: { opacity: 1, x: 5 },
+    tap: { opacity: 0.8, x: 1 },
+    focus: { opacity: 0.9, x: 2 },
   } as const;
 
   const surfaceVariants = {
     rest: { scale: 1 },
-    hover: { scale: 1.0025 },
-    tap: { scale: 0.998 },
-    focus: { scale: 1.001 },
+    hover: { scale: 1.008, transition: { type: "spring", stiffness: 500, damping: 18 } },
+    tap: { scale: 0.996 },
+    focus: { scale: 1.003 },
   } as const;
 
   return (
@@ -215,12 +214,12 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
         <motion.span
           className={getEtymologyBadgeClass(token.etymology)}
           whileHover={{
-            scale: 1.13,
-            y: -1.5,
-            transition: { type: "spring", stiffness: 380, damping: 15 },
+            scale: 1.18,
+            y: -2,
+            transition: { type: "spring", stiffness: 360, damping: 14 },
           }}
-          whileTap={{ scale: 0.94 }}
-          transition={{ type: "spring", stiffness: 320, damping: 20 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: "spring", stiffness: 300, damping: 18 }}
         >
           {ETYMOLOGY_LABELS[token.etymology]}
         </motion.span>
@@ -2045,8 +2044,8 @@ export default function SentenceAnalyzerPage() {
                       variants={{
                         visible: {
                           transition: {
-                            staggerChildren: 0.028,
-                            delayChildren: 0.04,
+                            staggerChildren: 0.032,
+                            delayChildren: 0.06,
                           },
                         },
                       }}
@@ -2055,11 +2054,12 @@ export default function SentenceAnalyzerPage() {
                         <motion.div
                           key={token.id}
                           variants={{
-                            hidden: { opacity: 0, y: 9 },
+                            hidden: { opacity: 0, y: 14, scale: 0.96 },
                             visible: {
                               opacity: 1,
                               y: 0,
-                              transition: { type: 'spring', stiffness: 340, damping: 26, mass: 0.85 },
+                              scale: 1,
+                              transition: { type: 'spring', stiffness: 300, damping: 24, mass: 0.9 },
                             },
                           }}
                         >

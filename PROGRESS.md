@@ -214,3 +214,15 @@ Vercel 部署：
 - 已多次提交并推送最新代码
 
 所有方向都在并行推进中。用户可随时部署体验。
+
+[实时更新] 2026-05-28 20:10
+- 完成 2025-2026 顶级 Calm Premium + 灵动交互调研（MagicUI、ibelick/motion-primitives、Josh Comeau、Serene 等）
+- 已执行多轮高优先级优化：
+  - TokenCard hover / badge / 入场 stagger 大幅强化（premium spring + 层次阴影）
+  - History 卡片 hover + 空状态持续精炼
+  - 成功反馈自然度提升
+  - 整体纸本高级质感持续打磨
+- 所有改动已多次提交并推送 GitHub
+
+下一阶段：继续在剩余方向（Modal 细节、加载状态、更多微交互）并行推进。
+用户可随时 ./scripts/deploy.sh 更新线上版本体验。

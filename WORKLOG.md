@@ -1022,3 +1022,41 @@ Vercel 应该会自动开始部署（如果已连接 GitHub）。
 - 保持「安静高级治愈」核心调性，只加「有呼吸的灵动」
 
 所有改动会实时记录在此日志，用户可继续 tail -f 查看。
+
+[2026-05-28 20:10:00] 调研总结 + 执行更新（用户要求「先调研再建议并直接执行」）
+
+2025-2026 当前最受欢迎的 Calm Premium + 灵动交互趋势：
+- 核心审美：低饱和、纸感材质、极致留白、精致 CJK 排版（Linear / Serene / 高端 shadcn 主题）
+- 灵动交互：有目的的 spring 微交互（MagicUI、ibelick/motion-primitives、Josh Comeau 风格）—— 不花哨但极有质感
+- 语言学习参考：从重度游戏化转向「平静导师」体验（优雅反馈 + 诗意空状态 + 情感化微细节）
+
+顶级参考仓库（已采纳）：
+- magicuidesign/magicui（动画组件首选）
+- ibelick/motion-primitives（干净高质 motion 基础）
+- jibcamun/Serene（极致 calm premium）
+- shadcn-ui + Aceternity 灵感组件
+
+本次执行：
+- TokenCard hover 进一步强化（更强阴影层次 + 更自然的 premium spring）
+- Etymology badge pop 更优雅有书卷感
+- History 卡片 hover lift 加强
+- 成功按钮 scale 更自然有完成感
+- 结果面板入场 + 空状态呼吸动画持续打磨
+
+所有改动已提交推送（最新 30039ef 等）。
+用户可执行 ./scripts/deploy.sh 立即体验。
+
+[2026-05-28 20:20:00] 用户明确要求：「优化就可以，我最后只看效果」—— 不再需要频繁确认，直接执行多方向优化。
+
+基于最新调研（MagicUI、ibelick/motion-primitives、Josh Comeau、Serene、calm premium 趋势），我将并行推进以下高优先级方向（保持「安静高级治愈」核心调性，只增加有呼吸的灵动感和留人质感）：
+
+执行计划（立即开始）：
+1. TokenCard 微交互再上一个档次（更 premium 的 hover、徽章、点击反馈 + 更好 stagger）
+2. History 卡片 hover + 入场 + 空状态持续精炼
+3. 「加入我的学习」成功反馈做到更自然、更有完成感
+4. 整体视觉材质感再强化（阴影、纹理、留白、韩文美感）
+5. Modal 细节 + 结果面板入场 + 加载状态进一步打磨
+
+所有改动会实时追加到本日志，并持续 commit + push。
+用户可继续 `tail -f yujian/WORKLOG.md` 观察实时进展。
+最终效果由用户部署后自行评判。
