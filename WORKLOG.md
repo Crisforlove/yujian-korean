@@ -575,3 +575,5 @@ branch 'main' set up to track 'origin/main'.
   - 后端：Anthropic / OpenAI / DeepSeek / Gemini 全部可用
   - 模型参数已打通（UI → analyzer → route）
   - 提交准备中...
+[2026-05-28 17:35:10] 多提供商 + 推荐模型全部完成并提交
+[2026-05-28 17:35:22] 已添加多提供商迁移说明到 README.md
