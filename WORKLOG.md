@@ -842,3 +842,60 @@ e12e852 feat(aesthetic): Subagent 4 — visual elevation for dwell time (paper g
 - 当前工作树干净（除非有新改动）
 
 所有 5 个并行子代理的成果现在在 git 历史中清晰可见。
+[2026-05-28 17:54:28] 本地日志已提交，准备推送到 GitHub...
+To https://github.com/Crisforlove/yujian-korean.git
+   e1eccf4..c23197f  main -> main
+
+[2026-05-28 18:58:00] ✅ 已推送到 GitHub
+  远程仓库: https://github.com/Crisforlove/yujian-korean
+  最新 commit: c23197f (包含所有并行子代理优化 + 日志更新)
+  推送范围: 从 e1eccf4 到 c23197f (包含所有 UI/UX 灵动化 + 视觉提升工作)
+
+你现在应该能在 https://github.com/Crisforlove/yujian-korean 看到最新代码和提交历史了。
+所有 5 个并行子代理的成果都在 git 历史中清晰可见。
+
+工作树当前状态已同步。
+
+[2026-05-28 19:05:00] 用户反馈：在 GitHub 和 Vercel 上都没看到更新，还是之前的样子。
+用户已经 redeploy 过，但没有看到变化。
+需要排查：
+- GitHub 是否真的收到了最新的 push（c23197f 等）
+- Vercel 是否基于最新 commit 构建
+- 用户是否在看正确的页面/分支
+
+我将指导用户如何确认 GitHub 上的最新 commit。
+
+[2026-05-28 19:10:00] 用户反馈：
+用户在 GitHub 上看到了这个 commit：
+"chore(logs): update progress after parallel UI/UX optimization phase"
+
+这对应本地 commit c23197f（我们最近一次日志更新提交）。
+
+说明：
+- GitHub 已经收到了我们最近的推送（至少这个 commit 可见）。
+- 用户可能只看到了日志相关的 commit 信息，还没深入看具体代码改动（page.tsx / globals.css 中的 TokenCard、History、Modal 等动画和视觉优化）。
+
+下一步行动：
+- 引导用户检查具体文件改动（尤其是 app/page.tsx 和 app/globals.css）。
+- 确认 Vercel 是否基于这个 commit 重新部署。
+- 让用户实际在界面上测试 Token hover、History 入场、Modal 动画等是否有变化。
+
+[2026-05-28 19:20:00] 用户反馈：
+- GitHub 没问题（能看到最新提交，包括 c23197f 等）
+- 但 Vercel 部署后还是看不到新改动（TokenCard 动画、History 入场、Modal 物理、视觉质感等）
+
+分析：
+Vercel 部署**不是**每次都自动基于 GitHub main 分支的最新 commit，尤其是手动 Redeploy 时容易选错。
+
+常见原因：
+1. 手动 Redeploy 时选择了旧的 Deployment（基于旧 commit）
+2. "Use existing Build Cache" 开启了
+3. Vercel 项目连接的分支不是 main
+4. 没有真正触发基于最新 commit 的新构建
+
+建议用户：
+- 去 Vercel 项目 → Deployments
+- 找到最新的 commit（应该是 c23197f 或更新的）
+- 点击那个 commit 旁边的 "Redeploy"（而不是随便点一个旧的）
+- 或者在 GitHub 里 push 一个新空 commit 强制触发自动部署
+[2026-05-28 18:04:48] 用户同意直接执行命令行操作，准备推送空提交强制 Vercel 重新部署最新代码
