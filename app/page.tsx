@@ -669,10 +669,11 @@ function HistorySentenceCard({
         delay: entranceDelay,
       }}
       whileHover={{
-        y: -1.5,
-        transition: { type: "spring", stiffness: 420, damping: 30 },
+        y: -2.5,
+        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        transition: { type: "spring", stiffness: 380, damping: 26 },
       }}
-      whileTap={{ scale: 0.987, y: 0.5 }}
+      whileTap={{ scale: 0.985, y: 0.5 }}
     >
       <div className="history-item-meta">
         <span className="history-date">{formatHistoryDate(item.addedAt)}</span>
@@ -798,10 +799,11 @@ function WordBankCard({
         delay: entranceDelay,
       }}
       whileHover={{
-        y: -1.5,
-        transition: { type: "spring", stiffness: 420, damping: 30 },
+        y: -2.5,
+        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        transition: { type: "spring", stiffness: 380, damping: 26 },
       }}
-      whileTap={{ scale: 0.987, y: 0.5 }}
+      whileTap={{ scale: 0.985, y: 0.5 }}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
