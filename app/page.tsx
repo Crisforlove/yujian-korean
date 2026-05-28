@@ -18,7 +18,8 @@ import {
   Star,
   Award,
   Filter,
-  RefreshCw
+  RefreshCw,
+  Settings
 } from 'lucide-react';
 
 import { analyzeSentenceWithKey, AnalysisError } from '@/lib/llm/analyzer';
@@ -32,6 +33,7 @@ import {
   unmarkHistoryAsFocus,
   getAllWordEntries,
   deleteWordEntry,
+  clearAllData,
 } from '@/lib/history-service';
 import type { AnalyzedSentence, Token, EtymologyTag, WordEntry, HistoryItem } from '@/lib/types';
 
@@ -801,13 +803,16 @@ export default function SentenceAnalyzerPage() {
   // ------------------------------------------------------------------------
   // Task 7: My Learning / History view state (integrated single-file view switcher)
   // ------------------------------------------------------------------------
-  const [activeView, setActiveView] = useState<'analyzer' | 'history'>('analyzer');
+  const [activeView, setActiveView] = useState<'analyzer' | 'history' | 'settings'>('analyzer');
 
   // Raw data
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [wordEntries, setWordEntries] = useState<WordEntry[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [historyProcessingId, setHistoryProcessingId] = useState<string | null>(null); // for per-item disable
+
+  // Task 8: Settings clearing state (local-only, guarded)
+  const [isClearingData, setIsClearingData] = useState(false);
 
   // Filters (Task 7 scope)
   const [itemTypeFilter, setItemTypeFilter] = useState<ItemTypeFilter>('all');
@@ -1128,6 +1133,37 @@ export default function SentenceAnalyzerPage() {
     }
   };
 
+  // Task 8: Clear all user data (history + words + sentences + apiKey) with confirmation
+  // Important for user trust and control. Uses the guarded clearAllData from service.
+  const handleClearAllData = async () => {
+    const confirmed = window.confirm(
+      '确认清除「全部我的数据」？\n\n此操作将永久删除：\n• 所有句子分析历史\n• 单词学习库\n• 个人标记与笔记\n• 已保存的 API Key\n\n数据仅存储于本浏览器本地，操作不可恢复。'
+    );
+    if (!confirmed) return;
+
+    setIsClearingData(true);
+    try {
+      await clearAllData();
+      clearApiKey(); // also wipe the key from localStorage + state
+
+      // Reset local UI caches
+      setHistoryItems([]);
+      setWordEntries([]);
+      setReplayItem(null);
+
+      setShowHistoryToast('全部数据已清除。本地存储现已清空。');
+      window.setTimeout(() => setShowHistoryToast(null), 2400);
+
+      // Optionally return user to analyzer for fresh start
+      setActiveView('analyzer');
+    } catch (e) {
+      console.error('[Task8] clearAllData failed', e);
+      alert('清除失败，请重试或刷新页面。');
+    } finally {
+      setIsClearingData(false);
+    }
+  };
+
   // Per-item actions (Task 7 scope)
   const handleMarkMastered = async (id: string) => {
     setHistoryProcessingId(id);
@@ -1318,7 +1354,7 @@ export default function SentenceAnalyzerPage() {
               </div>
             </div>
 
-            {/* Elegant view switcher (Task 7) — no route change, pure client state */}
+            {/* Elegant view switcher (Task 7+8) — analyzer / history / settings. Pure client state, no routes. */}
             <div className="view-switcher" role="tablist" aria-label="主视图切换">
               <button
                 role="tab"
@@ -1336,41 +1372,35 @@ export default function SentenceAnalyzerPage() {
               >
                 <History className="w-3.5 h-3.5" /> 我的学习
               </button>
+              <button
+                role="tab"
+                aria-selected={activeView === 'settings'}
+                onClick={() => setActiveView('settings')}
+                className={`view-tab ${activeView === 'settings' ? 'active' : ''}`}
+              >
+                <Settings className="w-3.5 h-3.5" /> 设置
+              </button>
             </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 pt-8 pb-24">
-        {/* Conditional rendering: Analyzer (original) vs History (Task 7) */}
+        {/* Conditional rendering: Analyzer / History (Task 7) / Settings (Task 8) — single file, no new routes or files */}
         {activeView === 'analyzer' ? (
           <>
-            {/* API Key — discreet but essential for core experience */}
-            <div className="api-key-bar">
+            {/* Slim API Key status — full management moved to Settings (Task 8) */}
+            <div className="api-key-status">
               <KeyRound className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" />
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => updateApiKey(e.target.value)}
-                placeholder="sk-ant-... （您的 Anthropic API Key，仅发送至安全服务端）"
-                className="api-key-input"
-                autoComplete="off"
-                spellCheck={false}
-              />
-              {isKeySaved && (
-                <span className="text-[var(--color-accent-sage)] text-xs font-medium flex items-center gap-1 whitespace-nowrap">
-                  <Check className="w-3.5 h-3.5" /> 已保存
-                </span>
-              )}
-              {apiKey && (
-                <button
-                  onClick={clearApiKey}
-                  className="text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] p-1 transition-colors"
-                  aria-label="清除 API Key"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
+              <span className="text-sm text-[var(--color-text-secondary)]">
+                {isKeySaved ? 'Anthropic API Key 已安全保存于本地浏览器' : '尚未配置 API Key'}
+              </span>
+              <button
+                onClick={() => setActiveView('settings')}
+                className="api-key-manage-link"
+              >
+                在设置中管理 →
+              </button>
             </div>
 
             {/* Sentence input */}
@@ -1578,7 +1608,7 @@ export default function SentenceAnalyzerPage() {
               </div>
             )}
           </>
-        ) : (
+        ) : activeView === 'history' ? (
           /* =====================================================================
              Task 7: My Learning / History View — time-reversed elegant list
              Full filters, per-item actions, export, replay. Matches design tokens.
@@ -1703,13 +1733,110 @@ export default function SentenceAnalyzerPage() {
               </>
             )}
           </div>
+        ) : (
+          /* =====================================================================
+             Task 8: Settings & API Key Management
+             Calm, minimal, local-only. Reuses existing updateApiKey / clearApiKey / clearAllData.
+             Matches the healing, low-saturation aesthetic of the entire project.
+          ===================================================================== */
+          <div className="settings-view">
+            <div className="settings-header">
+              <div className="flex items-center gap-3">
+                <Settings className="w-5 h-5 text-[var(--color-accent-sage)]" />
+                <h2 className="text-xl font-semibold tracking-tight">设置 · 安全与数据</h2>
+              </div>
+              <p className="text-sm text-[var(--color-text-tertiary)] mt-1">所有内容仅存于您的浏览器本地。永不离开设备。</p>
+            </div>
+
+            {/* API Key Section — the core of Task 8 */}
+            <div className="settings-section">
+              <div className="settings-section-title">
+                <KeyRound className="w-4 h-4" /> Anthropic API Key
+              </div>
+
+              <div className="settings-key-wrap">
+                <input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => updateApiKey(e.target.value)}
+                  placeholder="sk-ant-... （仅本地保存，通过 HTTPS 安全发送至分析服务）"
+                  className="settings-key-input"
+                  autoComplete="off"
+                  spellCheck={false}
+                  aria-describedby="key-help"
+                />
+                <div className="settings-key-actions">
+                  {isKeySaved && (
+                    <span className="settings-key-status">
+                      <Check className="w-3.5 h-3.5" /> 已保存（本地）
+                    </span>
+                  )}
+                  {apiKey && (
+                    <button
+                      onClick={clearApiKey}
+                      className="settings-clear-btn"
+                      aria-label="清除 API Key"
+                      disabled={isClearingData}
+                    >
+                      <Trash2 className="w-4 h-4" /> 清除
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div id="key-help" className="settings-help-text">
+                您的 Key 仅保存在浏览器 localStorage，绝不发送到任何服务器（除分析请求外）。服务端接收后立即丢弃。
+              </div>
+            </div>
+
+            {/* How to get the key — clear, trustworthy instructions + link */}
+            <div className="settings-section">
+              <div className="settings-section-title">如何获取 Anthropic API Key？</div>
+              <div className="settings-instructions">
+                <ol className="settings-steps">
+                  <li>访问官方控制台：<a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="settings-link">https://console.anthropic.com/</a></li>
+                  <li>使用邮箱注册或登录 Anthropic 账户</li>
+                  <li>进入「API Keys」页面，点击「Create Key」生成新密钥（格式以 <code>sk-ant-</code> 开头）</li>
+                  <li>复制密钥并粘贴到上方密码框中即可立即使用（无需保存按钮，输入即自动保存）</li>
+                </ol>
+                <p className="settings-note">
+                  提示：免费额度通常足够日常学习使用。请妥善保管您的 Key，切勿分享给他人。
+                  本应用完全本地优先，Key 管理权永远在您手中。
+                </p>
+              </div>
+            </div>
+
+            {/* Danger Zone: Clear all data — essential for user trust */}
+            <div className="settings-section settings-danger">
+              <div className="settings-section-title text-[var(--color-text-secondary)]">数据管理</div>
+              <p className="text-sm text-[var(--color-text-secondary)] mb-4 leading-relaxed">
+                清除本设备上的全部学习记录、单词库、历史与已保存的 API Key。此操作<b>不可恢复</b>。
+              </p>
+              <button
+                onClick={handleClearAllData}
+                disabled={isClearingData}
+                className="settings-danger-btn"
+              >
+                {isClearingData ? (
+                  <>正在清除全部数据…</>
+                ) : (
+                  <>清除全部我的数据</>
+                )}
+              </button>
+              <p className="text-[10px] text-[var(--color-text-muted)] mt-2 tracking-wide">点击后将弹出确认对话框。建议在操作前先使用「导出」功能备份。</p>
+            </div>
+
+            <div className="settings-footer-note">
+              语见 · 所有数据与密钥均严格本地化 · 尊重您的隐私与控制权
+            </div>
+          </div>
         )}
       </main>
 
-      {/* Subtle footer note — security & scope transparent (updated for Task 7) */}
+      {/* Subtle footer note — security & scope transparent (updated for Task 8) */}
       <footer className="max-w-4xl mx-auto px-6 pb-12 text-[10px] text-[var(--color-text-muted)] text-center tracking-wide">
         API Key 仅在浏览器本地保存并通过 HTTPS 安全发送至 /api/analyze（服务端使用后立即丢弃）。<br />
-        Task 7 我的学习 / 历史页面：时间倒序列表 · 多维筛选 · 标记掌握/专注/删除 · JSON + Markdown 导出 · 完全使用 Task 3 数据层 + Task 2 设计令牌。
+        Task 8 设置：本地 Key 管理（密码输入 + 自动保存/清除）+ 获取指引链接 + 清除全部数据（确认保护）。完全本地，尊重隐私。
       </footer>
 
       {/* Auto-save toast (sentence) */}

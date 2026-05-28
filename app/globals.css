@@ -1258,3 +1258,231 @@ a:hover {
     font-size: 1.05rem;
   }
 }
+
+/* ==========================================================================
+   Task 8: Settings & API Key Management — calm, minimal, healing aesthetic
+   100% reuse of design tokens (warm cream, soft borders, sage accents, generous space)
+   No flashy elements. Password field, instructions, trust-building clear-data.
+   ========================================================================== */
+
+/* Slim status indicator in Analyzer (replaces the old full input bar) */
+.api-key-status {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.8125rem;
+}
+.api-key-manage-link {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--color-accent-sage);
+  background: none;
+  border: none;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+.api-key-manage-link:hover {
+  background: var(--color-bg-elevated);
+  color: var(--color-accent-sage);
+  text-decoration: underline;
+}
+
+/* Settings view container — spacious, quiet */
+.settings-view {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+}
+.settings-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.settings-section {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.settings-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.875rem;
+  letter-spacing: -0.005em;
+}
+
+/* Key input area inside settings (password, calm mono) */
+.settings-key-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+@media (min-width: 480px) {
+  .settings-key-wrap {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+}
+.settings-key-input {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 0.5rem;
+  color: var(--color-text-primary);
+  min-width: 0;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.settings-key-input:focus {
+  border-color: var(--color-accent-sage);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(127, 143, 122, 0.08);
+}
+.settings-key-input::placeholder {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+}
+.settings-key-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.settings-key-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-accent-sage);
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
+  background: rgba(127, 143, 122, 0.08);
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+.settings-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.settings-clear-btn:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.settings-clear-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-help-text {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+
+/* Instructions + link (trustworthy, scannable) */
+.settings-instructions {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+.settings-steps {
+  margin: 0.5rem 0 0.875rem;
+  padding-left: 1.25rem;
+}
+.settings-steps li {
+  margin-bottom: 0.375rem;
+}
+.settings-link {
+  color: var(--color-accent-sage);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.settings-link:hover {
+  color: var(--color-text-primary);
+}
+.settings-note {
+  margin-top: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--color-bg-subtle);
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+  border-left: 3px solid var(--color-accent-sage);
+}
+
+/* Danger zone — restrained but clearly important for trust */
+.settings-danger {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-subtle);
+}
+.settings-danger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+.settings-danger-btn:hover:not(:disabled) {
+  background: #f8f1f0; /* very subtle warm for destructive affordance */
+  border-color: #c9a9a4;
+  color: #6b4f4a;
+}
+.settings-danger-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.settings-footer-note {
+  text-align: center;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  margin-top: 2rem;
+  letter-spacing: 0.03em;
+}
+
+/* Small refinements for settings on narrow screens */
+@media (max-width: 640px) {
+  .settings-key-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .settings-key-actions {
+    justify-content: flex-start;
+  }
+}

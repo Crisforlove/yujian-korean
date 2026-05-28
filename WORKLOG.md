@@ -276,3 +276,69 @@ All 4 required files created. Now: typecheck + commits.
 - 范围纪律：零新文件、零新路由、零新依赖、零 data layer 修改
 - 下一阶段准备：Task 8 设置页 / Task 9 导航路由拆分
 
+[2026-05-28 19:02:15] ✅ 干净 Git 提交完成：
+  SHA: 806b232
+  Message: feat(history): implement Task 7 - My Learning / History Page (time-reversed elegant list + filters + actions + export)
+  Files: 仅 app/page.tsx + app/globals.css + WORKLOG.md (3 files, +1529/-214)
+  验证：tsc 0错、eslint 0错、next build 成功
+  范围完全遵守：无新建文件、无路由变更、仅用现有数据层与设计令牌
+  Task 7 正式结束。准备好进入 Task 8。
+
+
+[2026-05-28 16:33:40] ✅ Task 7 子代理执行完成
+  Status: DONE (319秒, 77 tool calls)
+  Subagent ID: 019e6db2-c2f0-7a72-99d4-8ba3509690a5
+
+[2026-05-28 16:33:45] Task 7 核心交付:
+  - 我的学习页面完整实现（单页内 view switcher）
+  - 时间倒序优雅列表 + 完整筛选（日期 / 词源 / 句子vs单词 / 状态）
+  - 每条记录操作：标记掌握、设为专注、删除
+  - 一键导出（JSON + 漂亮的中文优先 Markdown）
+  - AnalysisReplayModal（可重放保存的完整分析）
+  - 所有样式复用 Task 2 设计令牌，极致安静治愈
+
+[2026-05-28 16:33:50] Git 提交:
+  - 806b232 feat(history): implement Task 7 - My Learning / History Page
+    (3 files, +1529/-214)
+
+[2026-05-28 16:33:55] 验证通过: tsc clean, lint clean, npm run build 成功
+
+[2026-05-28 16:34:00] 下一动作: 启动 Task 8 子代理（设置与 API Key 管理）
+  目标: API Key 输入/保存/清除 + 说明 + 数据管理（清除全部数据）
+
+[2026-05-28 16:34:15] ✅ Task 8 子代理已启动
+  ID: 019e6db7-fadd-7b53-a692-68a1f66009d8
+  目标: 设置页（API Key 输入/保存/清除 + 获取说明 + 清除全部数据按钮）
+  状态: 后台执行中...
+
+[2026-05-28 16:34:20] 日志持续更新中...
+
+[2026-05-28 19:10:00] ✅ Task 8 正式启动：设置与 API Key 管理 (Settings & API Key Management)
+- 严格范围：仅编辑 app/page.tsx + app/globals.css + WORKLOG.md（绝不新建任何文件、路由或组件）
+- 目标：Settings 视图（或 section）：
+  • 安全本地-only Anthropic API Key 输入（password 字段 + save/clear，复用 localStorage 'yujian:apiKey' 现有模式）
+  • 清晰获取 Key 说明 + 官方链接
+  • “清除全部我的数据” 按钮 + 确认（信任建立关键），调用 history-service 的 clearAllData
+- 设计：平静极简，完美匹配项目治愈美学（复用 design-tokens + Task 7 view-switcher 模式）
+- 架构：将 activeView 扩展为 'analyzer' | 'history' | 'settings'；Analyzer 内 key bar 精简为状态指示 + 去设置入口（不破坏功能）
+- 附：追加式日志将通过 terminal 在关键节点记录；最终一个干净 commit
+
+
+[2026-05-28 19:15:30] Task 8 实现开始：已更新导入（新增 lucide Settings 图标 + history-service clearAllData） + activeView 类型扩展为包含 'settings'。严格使用 search_replace 精准编辑。准备扩展 switcher + 实现 Settings section。
+
+
+[2026-05-28 19:25:45] Task 8 核心功能已落地（page.tsx）：3 视图切换、Settings 完整 UI（Key 密码输入+live localStorage、获取说明+链接、清除全部数据+confirm + toast）、Analyzer 精简状态提示。即将追加匹配治愈美学的 .settings-* 样式到 globals.css。所有变更零新文件。
+
+
+[2026-05-28 19:32:10] ✅ Task 8 样式已追加到 globals.css（.api-key-status + 完整 .settings-* 系列）。完全基于 Task 2 design-tokens：低饱和奶油底、柔和边框、sage 强调、大量留白。无多余动效，平静极简。准备进入质量验证阶段。
+
+
+[2026-05-28 19:40:00] ✅ Task 8 质量门禁全部通过：
+- npx tsc --noEmit : 0 errors (clean)
+- npx eslint app/page.tsx : 0 errors/warnings (strict)
+- npm run build : ✓ Compiled successfully (生产就绪，IndexedDB 构建警告为预期)
+- 所有变更严格限于 app/page.tsx + app/globals.css + WORKLOG.md（零新建文件、零路由、零新依赖）
+- 完整交付：Settings 视图（Key 密码框 + live localStorage + 清除 + 说明链接 + 确认清除全部数据） + Analyzer 精简状态 + 3-tab switcher + 匹配治愈样式的 CSS
+
+[2026-05-28 19:40:30] 准备最终提交：git add 仅限修改的 3 个文件。Commit 将原子描述 Task 8 完整交付，遵循“一个干净提交”要求。
+
