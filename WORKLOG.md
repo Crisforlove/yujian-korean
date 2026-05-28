@@ -145,3 +145,56 @@ All 4 required files created. Now: typecheck + commits.
 [2026-05-28 17:22:30] 质量门禁：tsc --noEmit ✓ 0 错误；eslint app/page.tsx ✓ 0 错误（已修复 setState-in-effect 及 unused import）
 [2026-05-28 17:22:40] 视觉：所有样式使用 CSS 变量 + 治愈系低饱和配色，token-grid 响应式，卡片 hover 微妙动效。
 [2026-05-28 17:22:50] 范围纪律：仅编辑 page.tsx + globals.css（追加分析器样式）+ WORKLOG.md。无新组件、无 settings 页、无历史列表页。
+[2026-05-28 17:26:05] ✅ 干净 Git 提交完成：54b5ce2
+[2026-05-28 17:26:10] feat(analyzer): implement Task 5 - Sentence Analyzer Page (Core Experience)
+[2026-05-28 17:26:15] 3 files, +878 insertions。严格遵守范围纪律。
+[2026-05-28 17:26:20] 下一阶段准备就绪：可进入 Task 6（单词详情与查词）或整体打磨。
+[2026-05-28 17:32:00] Task 5 子代理执行完毕。所有质量门禁通过，干净提交就位。准备好移交下一任务。
+
+[2026-05-28 16:24:00] ✅ Task 5 子代理执行完成
+  Status: DONE (226秒, 65 tool calls)
+  Subagent ID: 019e6dab-5554-78f1-8b6f-e794dffc8f7d
+
+[2026-05-28 16:24:05] Task 5 核心交付:
+  - app/page.tsx: 完整重写为核心句子分析器（Client Component）
+    • 大输入框 + Cmd/Ctrl+Enter 快捷键
+    • API Key 本地保存（仅发往 /api/analyze）
+    • 调用 analyzeSentenceWithKey（来自 Task 4）
+    • 漂亮结果面板：中文翻译优先 + 语法分析 + Token Grid
+    • 每个 token 使用 Task 2 词源徽章（固有词/汉字词/外来词）
+    • 成功后自动保存到 Dexie（Task 3）
+  - globals.css: 大量优雅分析器样式（完全复用 Task 2 设计令牌）
+
+[2026-05-28 16:24:10] Git 提交:
+  - 54b5ce2 feat(analyzer): implement Task 5 - Sentence Analyzer Page (Core Experience)
+    (3 files, +878/-54)
+
+[2026-05-28 16:24:15] 验证通过: tsc clean, lint clean, npm run build 成功
+
+[2026-05-28 16:24:20] 下一动作: 启动 Task 6 子代理（单词详情与查词）
+  目标: 可点击 token 打开单词卡 + 独立查词功能 + 词源详情
+
+[2026-05-28 16:24:35] ✅ Task 6 子代理已启动
+  ID: 019e6daf-2b0a-7f50-9cd3-57506a606e2a
+  目标: 单词详情页/抽屉 + token 可点击 + 独立查词 + 保存到学习历史
+  状态: 后台执行中...
+
+[2026-05-28 16:24:40] 日志会继续实时追加，建议保持 tail -f 开启
+[2026-05-28 18:00:00] ✅ Task 6 正式启动：单词详情与查词 (Word Detail & Lookup)
+- 严格范围：仅编辑 app/page.tsx、app/globals.css、WORKLOG.md（绝不新建文件）
+- 目标：使 analyzer 中的 Token 可点击打开详情；构建精美 Word Detail modal（复用 Task 2 etymology badge 样式）；展示 word + badge、Hanja、meanings (gloss)、examples (上下文)；"Add to my learning" 使用 saveWordEntry 保存到 Dexie words 表
+- 独立查词：添加"快速查词"输入，复用 analyzeSentenceWithKey（单词作为输入）提取 token 打开详情
+- 计划：先更新 TokenCard 支持点击态 + modal 状态；实现内部 WordDetailModal 组件；追加样式；集成保存逻辑 + toast；质量验证 tsc/lint/build
+- 遵循：AGENTS.md + 之前子代理纪律 + 治愈美学设计令牌
+[2026-05-28 18:05:10] 准备代码实现：已读取 page.tsx (全)、globals.css (全)、types/db/history-service。确认 words 表与 saveWordEntry 就绪、Token 类型包含 hanja/gloss/etymology。即将使用 search_replace 精确编辑（仅 page + css + log）。Token 将变为可点击，添加内部 modal 实现 + lookup 区。
+[2026-05-28 18:15:30] 进入质量验证阶段：执行 tsc --noEmit + eslint + next build（生产就绪门禁）。所有 Task 6 变更均在 page.tsx + globals.css 内，复用已有服务与令牌。
+[2026-05-28 18:22:45] ✅ 质量门禁全部通过：
+- npx tsc --noEmit : 0 errors (clean)
+- npx eslint app/page.tsx : 0 errors/warnings (after 1 行 unused 修复)
+- npm run build : ✓ Compiled successfully, static generation OK（IndexedDB 构建时警告为预期，与 Task 5 一致）
+- 所有变更严格限于 app/page.tsx + app/globals.css + WORKLOG.md（未创建任何新文件）
+- 完整实现了：可点击 TokenCard（含 a11y）、精美 WordDetailModal（词源徽章复用 Task 2 样式 + Hanja + 释义 + 上下文例句 + Dexie saveWordEntry）、独立查词输入（复用 analyzer）
+- 加入学习按钮保存完整 WordEntry（含 definitions/examples/hanja）
+- 视觉：完全匹配治愈系设计令牌与徽章系统，ESC 关闭、toast 反馈、加载态等
+- 下一动作：追加最终日志 + 创建一个干净的原子提交
+[2026-05-28 18:25:10] 准备最终提交：git add 仅 app/page.tsx app/globals.css WORKLOG.md（精确范围）。Commit 将原子描述 Task 6 完整交付。
