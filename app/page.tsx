@@ -2433,16 +2433,16 @@ export default function SentenceAnalyzerPage() {
                     <div className="font-medium mb-1">Key 测试失败（403）</div>
                     <div>{keyTestError}</div>
                     <div className="mt-2 text-xs leading-relaxed">
-                      常见原因：<br/>
-                      • Key 无效、过期或权限不足<br/>
-                      • 账户没有余额 / 免费额度已用完<br/>
-                      • 没有开通对应模型的使用权限<br/>
-                      • Key 和当前选择的提供商不匹配<br/>
-                      • 中转站对请求来源或 User-Agent 有校验<br/><br/>
+                      常见原因（尤其是中转站）：<br/>
+                      • 中转站限制了 Vercel / 云服务器 IP（最常见）<br/>
+                      • Key 在中转站没有对应模型权限或额度<br/>
+                      • Base URL 填写错误<br/>
+                      • 中转站对请求头有严格校验<br/><br/>
                       建议：<br/>
-                      1. 尝试在上面填写你的中转站 Base URL<br/>
-                      2. 去对应平台/中转站控制台检查 Key 状态和额度<br/>
-                      3. 尝试切换其他提供商测试
+                      1. 确认你填的 Base URL 是正确的（vpsairobot 用户通常是 https://api.vpsairobot.com/v1 或你专属的地址）<br/>
+                      2. 在中转站后台检查这个 Key 的额度、模型权限和 IP 白名单<br/>
+                      3. 尝试换一个其他中转站测试（很多中转站会封 Vercel IP）<br/>
+                      4. 本地运行测试（`npm run dev`）如果本地能用，基本可以确认是 Vercel IP 被中转站封了
                     </div>
                   </div>
                 )}

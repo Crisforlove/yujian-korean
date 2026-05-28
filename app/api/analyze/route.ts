@@ -201,9 +201,9 @@ async function callOpenAICompatible(
     maxRetries: 1,
   };
 
-  // Only set custom User-Agent for official endpoints.
-  // For 中转站 / relays (when user provides custom baseURL), use default headers
-  // to avoid being blocked by strict relays.
+  // For official endpoints, send a nice User-Agent.
+  // For relays (custom baseURL), do NOT send custom User-Agent at all,
+  // to maximize compatibility with strict 中转站.
   if (!baseURL) {
     openaiConfig.defaultHeaders = {
       'User-Agent': 'Yujian/1.0 (https://github.com/Crisforlove/yujian-korean)',
