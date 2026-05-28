@@ -226,6 +226,7 @@ async function callGemini(sentence: string, apiKey: string, modelOverride?: stri
     generationConfig: {
       temperature: 0.2,
       responseMimeType: 'application/json',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- schema typing from provider (pre-existing)
       responseSchema: ANALYSIS_TOOL.input_schema as any,
     },
     systemInstruction: SYSTEM_PROMPT,

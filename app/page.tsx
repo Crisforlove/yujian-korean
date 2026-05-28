@@ -53,19 +53,13 @@ const ETYMOLOGY_LABELS: Record<EtymologyTag, string> = {
 /** Calm spring physics for premium modal enter/exit — healing aesthetic, alive yet serene.
  *  Matches & extends existing TokenCard springs (stiffness ~260-380, high damping).
  *  Never linear or abrupt; physics feel premium and "alive".
+ *  Single config used for both directions (shared transition prop); sufficient for calm consistent feel.
  */
 const MODAL_SPRING = {
   type: "spring" as const,
   stiffness: 260,
   damping: 30,
   mass: 0.95,
-};
-
-const MODAL_EXIT_SPRING = {
-  type: "spring" as const,
-  stiffness: 300,
-  damping: 32,
-  mass: 0.85,
 };
 
 /** Gentle looping pulse for skeleton elements — subtle life without distraction */
@@ -2049,11 +2043,25 @@ export default function SentenceAnalyzerPage() {
               </div>
             )}
 
-            {/* Empty / hint state */}
+            {/* Poetic empty state — Subagent 4: a calm journal page inviting the first sentence */}
             {!result && !isLoading && !error && (
-              <div className="mt-10 text-center text-[var(--color-text-tertiary)] text-sm">
-                输入句子后点击「分析句子」即可获得完整的词源标注、语法解析与中英翻译。<br />
-                按 <kbd className="px-1 py-0.5 rounded bg-[var(--color-bg-subtle)] font-mono text-[10px]">/</kbd> 聚焦输入 · 方向键切换标签页 · 每个词元卡片可点击查看详情与加入学习。
+              <div className="poetic-empty">
+                <div className="poetic-empty-content">
+                  <svg width="42" height="42" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="mx-auto">
+                    {/* Delicate open notebook / calm page — minimal line art */}
+                    <path d="M9 8.5h24a3 3 0 013 3v25.5a3 3 0 01-3 3H9" />
+                    <path d="M15 8.5v31" />
+                    <path d="M20 15.5h10M20 21h10M20 26.5h7" />
+                    {/* Soft horizon / breath line */}
+                    <path d="M12 35.5c3.5 1.2 8 .8 12.5-1.2" opacity="0.6" />
+                  </svg>
+                  <div className="poetic-empty-title">
+                    纸页轻展。<br />静待第一缕韩语，像晨光落在松针。
+                  </div>
+                  <div className="poetic-empty-hint">
+                    输入句子并按 <kbd>/</kbd> 聚焦 · Cmd/Ctrl + Enter 分析<br />点击词元探索词源与例句，留下一段自己的学习痕迹
+                  </div>
+                </div>
               </div>
             )}
           </>
@@ -2169,22 +2177,50 @@ export default function SentenceAnalyzerPage() {
                   </div>
                 )}
 
-                {/* Empty states */}
+                {/* Empty states — poetic, calm, inviting (want to linger) */}
                 {filteredTotal === 0 && (
-                  <div className="mt-12 text-center py-10 border border-dashed border-[var(--color-border-subtle)] rounded-2xl bg-[var(--color-bg-subtle)]/40">
-                    <div className="text-[var(--color-text-tertiary)]">
+                  <motion.div
+                    className="history-empty-state mt-8 mb-4 poetic-empty history-empty"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 180, damping: 26, delay: 0.06 }}
+                  >
+                    <div className="mx-auto flex flex-col items-center text-center max-w-[340px] py-7">
+                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-bg-subtle)] text-[var(--color-accent-sage)]/75 ring-1 ring-inset ring-[var(--color-border-subtle)]/60">
+                        <BookOpen className="h-5.5 w-5.5" />
+                      </div>
+
                       {totalLearningCount === 0 ? (
-                        <>暂无学习记录。<br />分析句子或查词并「加入我的学习」后，会出现在这里。</>
+                        <>
+                          <div className="text-[11px] font-medium tracking-[0.14em] text-[var(--color-text-muted)] mb-1">心园 · 初启</div>
+                          <div className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--color-text-secondary)] mb-3">静待第一缕墨痕</div>
+                          <p className="text-[13px] leading-[1.65] text-[var(--color-text-tertiary)] max-w-[26ch]">
+                            像一页未书写的宣纸。<br />开始分析一句韩语，或将词语珍藏，<br />这里便会悄然生长，陪伴漫步。
+                          </p>
+                          <button
+                            onClick={() => switchView('analyzer')}
+                            className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)] hover:border-[var(--color-accent-sage)] hover:text-[var(--color-accent-sage)] active:bg-[var(--color-bg-subtle)] transition-all duration-150"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> 开始第一次分析
+                          </button>
+                        </>
                       ) : (
-                        <>没有符合当前筛选条件的记录。<br />尝试调整筛选条件或清除筛选。</>
+                        <>
+                          <div className="text-[11px] font-medium tracking-[0.14em] text-[var(--color-text-muted)] mb-1">风过无痕</div>
+                          <div className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--color-text-secondary)] mb-3">纱帐轻垂，暂无此景</div>
+                          <p className="text-[13px] leading-[1.65] text-[var(--color-text-tertiary)] max-w-[26ch]">
+                            当前筛选如薄雾笼园。<br />松开几缕丝线，或让清风再过。
+                          </p>
+                          <button
+                            onClick={clearAllHistoryFilters}
+                            className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)] hover:border-[var(--color-accent-sage)] hover:text-[var(--color-accent-sage)] active:bg-[var(--color-bg-subtle)] transition-all duration-150"
+                          >
+                            让风吹过 · 清除筛选
+                          </button>
+                        </>
                       )}
                     </div>
-                    {totalLearningCount > 0 && (
-                      <button onClick={clearAllHistoryFilters} className="mt-4 text-sm underline text-[var(--color-accent-sage)]">
-                        清除筛选
-                      </button>
-                    )}
-                  </div>
+                  </motion.div>
                 )}
 
                 <p className="mt-8 text-[10px] text-center text-[var(--color-text-muted)] tracking-wide">
