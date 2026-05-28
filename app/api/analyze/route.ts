@@ -1,24 +1,16 @@
 /**
  * Secure server Route Handler: /api/analyze
  *
- * Accepts a Korean sentence + the *user's own Anthropic API key* from the client.
- * The key is used ONLY for this single request to call Claude, then discarded.
+ * Accepts a Korean sentence + the user's own API key + chosen provider.
+ * The key is used ONLY for this single request, then discarded.
  *
  * SECURITY CONTRACT (never violate):
  * - The API key is NEVER logged.
- * - The API key is NEVER returned to the client in any response (success or error).
- * - The API key is NEVER persisted to DB, cookies, or any storage.
- * - All errors returned to client are sanitized (no key fragments, no raw Anthropic traces).
+ * - The API key is NEVER returned to the client.
+ * - The API key is NEVER persisted.
+ * - All errors returned to client are sanitized.
  *
- * Responsibilities:
- * - Input validation via zod (sentence + key format)
- * - Construct one-off Anthropic client with the provided key
- * - Call Claude using SYSTEM_PROMPT + ANALYSIS_TOOL for structured output
- * - Validate + normalize the tool result against analyzedSentenceSchema
- * - Generate trustworthy id + createdAt server-side
- * - Return clean AnalyzedSentence or structured error
- *
- * This is the ONLY place in the app that talks to the Anthropic API for analysis.
+ * Supported providers: anthropic | openai | gemini | deepseek
  */
 
 import Anthropic from '@anthropic-ai/sdk';

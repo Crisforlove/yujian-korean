@@ -145,3 +145,15 @@ tail -f yujian/WORKLOG.md
 - 当前处于部署准备阶段
 - **等待用户操作**：请先在 GitHub 创建仓库 Crisforlove/yujian-korean，然后执行远程添加和推送命令（详细步骤已写入 WORKLOG.md）
 - 一旦推送完成，我会继续在日志中记录 Vercel 部署流程
+
+[实时更新] 2026-05-28 17:19
+- GitHub 仓库创建并推送成功 ✅
+  仓库地址: https://github.com/Crisforlove/yujian-korean
+- 所有代码（含 vercel.json、README、AGENTS.md）已上传
+
+Vercel 部署：
+- 本机未安装 Vercel CLI
+- 推荐方式：在浏览器打开 https://vercel.com/new → Import Crisforlove/yujian-korean → 直接 Deploy
+- 部署后即可获得可公开访问的网站
+
+核心工作已全部完成，进入用户部署确认阶段。

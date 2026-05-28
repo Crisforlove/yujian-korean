@@ -23,6 +23,7 @@
  */
 
 import type { AnalyzedSentence } from '../types';
+import type { SupportedProvider } from './schema';
 
 // --------------------------------------------------------------------------
 // Error type (consistent with DatabaseError pattern in history-service)
@@ -60,6 +61,7 @@ export interface AnalyzeOptions {
 export async function analyzeSentenceWithKey(
   sentence: string,
   apiKey: string,
+  provider: SupportedProvider = 'anthropic',
   options: AnalyzeOptions = {}
 ): Promise<AnalyzedSentence> {
   const operation = 'analyzeSentenceWithKey';
@@ -67,9 +69,9 @@ export async function analyzeSentenceWithKey(
   if (!sentence || typeof sentence !== 'string' || !sentence.trim()) {
     throw new AnalysisError('Sentence must be a non-empty string.', operation, 'INVALID_INPUT');
   }
-  if (!apiKey || typeof apiKey !== 'string' || apiKey.length < 20) {
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.length < 10) {
     throw new AnalysisError(
-      'A valid Anthropic API key is required.',
+      'A valid API key is required for the selected provider.',
       operation,
       'MISSING_KEY'
     );
@@ -83,6 +85,7 @@ export async function analyzeSentenceWithKey(
       },
       body: JSON.stringify({
         sentence: sentence.trim(),
+        provider,
         apiKey,
       }),
       signal: options.signal,
@@ -145,14 +148,15 @@ export async function analyzeSentenceWithKey(
 export async function analyzeSentence(
   sentence: string,
   apiKey: string | undefined | null,
+  provider: SupportedProvider = 'anthropic',
   options: AnalyzeOptions = {}
 ): Promise<AnalyzedSentence> {
   if (!apiKey) {
     throw new AnalysisError(
-      'Please provide your Anthropic API key to enable AI analysis.',
+      'Please provide your API key to enable AI analysis.',
       'analyzeSentence',
       'MISSING_KEY'
     );
   }
-  return analyzeSentenceWithKey(sentence, apiKey, options);
+  return analyzeSentenceWithKey(sentence, apiKey, provider, options);
 }

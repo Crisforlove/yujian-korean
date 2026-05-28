@@ -20,6 +20,19 @@
 import { z } from 'zod';
 
 // --------------------------------------------------------------------------
+// Supported providers (keep in sync with lib/llm/providers.ts)
+// --------------------------------------------------------------------------
+
+export const providerSchema = z.enum([
+  'anthropic',
+  'openai',
+  'gemini',
+  'deepseek',
+]);
+
+export type SupportedProvider = z.infer<typeof providerSchema>;
+
+// --------------------------------------------------------------------------
 // Core enums & primitives (match lib/types.ts)
 // --------------------------------------------------------------------------
 
@@ -106,7 +119,8 @@ export type AnalyzedSentenceSchema = z.infer<typeof analyzedSentenceSchema>;
 // --------------------------------------------------------------------------
 // Route input schema (client -> /api/analyze)
 // - sentence: the Korean text to analyze
-// - apiKey: user's personal Anthropic key (never logged, never returned to client)
+// - provider: which LLM to use
+// - apiKey: user's personal key for the chosen provider
 // --------------------------------------------------------------------------
 
 export const analyzeRequestSchema = z
@@ -115,11 +129,8 @@ export const analyzeRequestSchema = z
       .string()
       .min(1, 'sentence is required')
       .max(500, 'sentence too long (max 500 chars for analysis)'),
-    apiKey: z
-      .string()
-      .min(20, 'Anthropic API key appears too short')
-      .max(200, 'API key too long')
-      .regex(/^sk-ant-/, 'API key must start with sk-ant- (Anthropic format)'),
+    provider: providerSchema.default('anthropic'),
+    apiKey: z.string().min(10, 'API key appears too short').max(200, 'API key too long'),
   })
   .strict();
 

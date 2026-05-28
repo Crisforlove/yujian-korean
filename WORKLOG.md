@@ -548,3 +548,23 @@ branch 'main' set up to track 'origin/main'.
 [2026-05-28 16:51:40] 检查 Vercel CLI 是否可用...
 
 [2026-05-28 17:18:52] Vercel CLI 检查结果已记录
+[2026-05-28 17:18:58] 已提交最新日志更新
+
+[2026-05-28 17:19:10] GitHub 推送完成总结：
+  ✅ 仓库已创建: https://github.com/Crisforlove/yujian-korean
+  ✅ 代码已完整推送（包含所有 Task 1-10 + vercel.json + 文档）
+
+[2026-05-28 17:19:15] Vercel 部署建议（Vercel CLI 当前未安装）：
+  最简单方式：
+  1. 打开 https://vercel.com/new
+  2. 选择 “Import Git Repository”
+  3. 搜索并导入 Crisforlove/yujian-korean
+  4. Vercel 会自动识别为 Next.js 项目，直接 Deploy 即可
+  部署后即可获得公开可访问的网站（支持完整 Claude 分析功能）
+
+  或者安装 Vercel CLI 后本地部署：
+  npm i -g vercel
+  vercel
+
+[2026-05-28 17:19:20] 核心开发 + GitHub 上传已全部完成！
+  你现在可以直接访问仓库查看代码了。

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { analyzeSentenceWithKey, AnalysisError } from '@/lib/llm/analyzer';
+import { PROVIDERS, DEFAULT_PROVIDER, type SupportedProvider } from '@/lib/llm/providers';
 import { 
   addToHistory, 
   saveWordEntry,
@@ -762,8 +763,7 @@ export default function SentenceAnalyzerPage() {
   // Input state
   const [sentenceInput, setSentenceInput] = useState('');
 
-  // API Key (client-only, never sent anywhere except our /api/analyze)
-  // Lazy initializer safely reads from localStorage on client mount (no setState-in-effect)
+  // API Key (client-only)
   const [apiKey, setApiKey] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -775,8 +775,22 @@ export default function SentenceAnalyzerPage() {
     return '';
   });
 
-  // Derived — always truthful, no extra state mutations needed
+  // Selected LLM Provider (new multi-provider support)
+  const [provider, setProvider] = useState<SupportedProvider>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('yujian:provider') as SupportedProvider | null;
+        return saved && PROVIDERS.some(p => p.id === saved) ? saved : DEFAULT_PROVIDER;
+      } catch {
+        return DEFAULT_PROVIDER;
+      }
+    }
+    return DEFAULT_PROVIDER;
+  });
+
+  // Derived
   const isKeySaved = apiKey.trim().length > 0;
+  const currentProviderConfig = PROVIDERS.find(p => p.id === provider)!;
 
   // Analysis flow
   const [isLoading, setIsLoading] = useState(false);
@@ -913,6 +927,14 @@ export default function SentenceAnalyzerPage() {
     } catch {}
   }, []);
 
+  // Provider persistence
+  const updateProvider = useCallback((newProvider: SupportedProvider) => {
+    setProvider(newProvider);
+    try {
+      localStorage.setItem('yujian:provider', newProvider);
+    } catch {}
+  }, []);
+
   // ------------------------------------------------------------------------
   // Core analysis handler — wires directly to analyzeSentenceWithKey (Task 4)
   // Auto-saves via history-service (Task 3) on success
@@ -923,7 +945,7 @@ export default function SentenceAnalyzerPage() {
 
     const keyToUse = apiKey.trim();
     if (!keyToUse) {
-      setError('请先输入您的 Anthropic API Key（仅用于本次安全分析）。');
+      setError(`请先在「设置」中输入您的 ${currentProviderConfig.label} API Key。`);
       setErrorCode('MISSING_KEY');
       return;
     }
@@ -935,7 +957,7 @@ export default function SentenceAnalyzerPage() {
 
     try {
       // Call the secure facade (routes through /api/analyze — key never leaves server scope)
-      const analysis = await analyzeSentenceWithKey(trimmedSentence, keyToUse);
+      const analysis = await analyzeSentenceWithKey(trimmedSentence, keyToUse, provider);
 
       // Success! Set result immediately for beautiful rendering
       setResult(analysis);
@@ -1860,22 +1882,39 @@ export default function SentenceAnalyzerPage() {
               <p className="text-sm text-[var(--color-text-tertiary)] mt-1">所有内容仅存于您的浏览器本地。永不离开设备。</p>
             </div>
 
-            {/* API Key Section — the core of Task 8 */}
+            {/* Provider Selection + API Key (multi-provider support) */}
             <div className="settings-section">
               <div className="settings-section-title">
-                <KeyRound className="w-4 h-4" /> Anthropic API Key
+                <KeyRound className="w-4 h-4" /> LLM 提供商
               </div>
 
+              {/* Provider selector */}
+              <div className="mb-4 flex flex-wrap gap-2">
+                {PROVIDERS.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => updateProvider(p.id)}
+                    className={`rounded-full px-4 py-1.5 text-sm transition-all border ${
+                      provider === p.id
+                        ? 'bg-[var(--color-accent-sage)] text-white border-[var(--color-accent-sage)]'
+                        : 'border-[var(--color-border)] hover:bg-[var(--color-bg-surface)]'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Key input - dynamic label & placeholder */}
               <div className="settings-key-wrap">
                 <input
                   type="password"
                   value={apiKey}
                   onChange={(e) => updateApiKey(e.target.value)}
-                  placeholder="sk-ant-... （仅本地保存，通过 HTTPS 安全发送至分析服务）"
+                  placeholder={`${currentProviderConfig.keyPlaceholder} （仅本地保存）`}
                   className="settings-key-input"
                   autoComplete="off"
                   spellCheck={false}
-                  aria-describedby="key-help"
                 />
                 <div className="settings-key-actions">
                   {isKeySaved && (
@@ -1896,24 +1935,44 @@ export default function SentenceAnalyzerPage() {
                 </div>
               </div>
 
-              <div id="key-help" className="settings-help-text">
+              <div className="settings-help-text mt-2">
                 您的 Key 仅保存在浏览器 localStorage，绝不发送到任何服务器（除分析请求外）。服务端接收后立即丢弃。
               </div>
             </div>
 
-            {/* How to get the key — clear, trustworthy instructions + link */}
+            {/* Dynamic instructions per provider */}
             <div className="settings-section">
-              <div className="settings-section-title">如何获取 Anthropic API Key？</div>
+              <div className="settings-section-title">如何获取 {currentProviderConfig.label} API Key？</div>
               <div className="settings-instructions">
                 <ol className="settings-steps">
-                  <li>访问官方控制台：<a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="settings-link">https://console.anthropic.com/</a></li>
-                  <li>使用邮箱注册或登录 Anthropic 账户</li>
-                  <li>进入「API Keys」页面，点击「Create Key」生成新密钥（格式以 <code>sk-ant-</code> 开头）</li>
-                  <li>复制密钥并粘贴到上方密码框中即可立即使用（无需保存按钮，输入即自动保存）</li>
+                  {provider === 'anthropic' && (
+                    <>
+                      <li>访问官方控制台：<a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="settings-link">https://console.anthropic.com/</a></li>
+                      <li>注册/登录后进入「API Keys」，点击「Create Key」（格式以 <code>sk-ant-</code> 开头）</li>
+                    </>
+                  )}
+                  {provider === 'openai' && (
+                    <>
+                      <li>访问 <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="settings-link">OpenAI API Keys</a></li>
+                      <li>登录后点击「Create new secret key」（格式以 <code>sk-</code> 开头）</li>
+                    </>
+                  )}
+                  {provider === 'gemini' && (
+                    <>
+                      <li>访问 <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="settings-link">Google AI Studio</a></li>
+                      <li>点击「Create API Key」（格式以 <code>AIza</code> 开头）</li>
+                    </>
+                  )}
+                  {provider === 'deepseek' && (
+                    <>
+                      <li>访问 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer" className="settings-link">DeepSeek 平台</a></li>
+                      <li>登录后创建新 Key（格式以 <code>sk-</code> 开头，兼容 OpenAI）</li>
+                    </>
+                  )}
+                  <li>复制密钥并粘贴到上方密码框中即可立即使用（输入即自动保存）</li>
                 </ol>
                 <p className="settings-note">
-                  提示：免费额度通常足够日常学习使用。请妥善保管您的 Key，切勿分享给他人。
-                  本应用完全本地优先，Key 管理权永远在您手中。
+                  提示：不同厂商免费额度差异较大。Key 完全本地存储，管理权永远在您手中。
                 </p>
               </div>
             </div>
