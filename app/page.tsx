@@ -309,24 +309,16 @@ function WordDetailModal({
   }, [onClose]);
 
   return (
-    <motion.div
+    <div
       className="word-detail-overlay"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="word-detail-title"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div
+      <div
         className="word-detail-modal"
         onClick={(e) => e.stopPropagation()}
-        initial={{ opacity: 0, y: 18, scale: 0.982 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 14, scale: 0.985 }}
-        transition={MODAL_SPRING}
       >
         {/* Modal header */}
         <div className="word-detail-header">
@@ -468,8 +460,8 @@ function WordDetailModal({
         <p className="word-detail-footer-note">
           保存后可在“我的学习”中复习（数据存储于本地 Dexie）。
         </p>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

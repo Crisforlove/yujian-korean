@@ -702,3 +702,17 @@ branch 'main' set up to track 'origin/main'.
 [2026-05-28 17:45:42] Subagent 5: ✅ ALL QUALITY GATES PASSED — lint:0/0, tsc --noEmit clean, npm run build succeeded (IndexedDB warning expected at build, non-blocking). Proceeding to clean git commit (only page.tsx, globals.css, route.ts lint-suppress, WORKLOG.md). PROGRESS.md excluded as unrelated to this subagent scope.
 [2026-05-28 17:45:45] Subagent 2: Quality gates PASSED — npx tsc --noEmit (clean), npm run lint (0 errors, 0 warnings after minor pre-existing any disable polish + dead const cleanup), npm run build (success, optimized pages). All changes respect calm aesthetic, use existing motion import + icons (BookOpen, Plus). No new files created. Ready for clean commit(s). History list now feels alive & poetic.
 [2026-05-28 17:45:53] Subagent 5: ✅ Task fully complete. Clean commit 413b1da created. All gates passed pre-commit. Modals now feel premium & alive with spring physics; analysis states use calm living skeletons matching healing aesthetic. Ready for review / further subagents. (Final append)
+[2026-05-28 19:22:00] ✅ Subagent 4 全部完成：视觉与审美全面提升（"让人想停留"）
+  交付清单（严格限于现有文件 + WORKLOG）：
+  • app/globals.css + app/page.tsx
+    - 极淡纸纹质感：body + 所有主要表面（token-card、result-panel、history cards、modals、sections）叠加 fractalNoise SVG grain (opacity 0.02x) + 纸张 catch-light 柔梯度。fixed + local attachment，像真实细腻米纸本。
+    - 深度层次：多层阴影（3-4 层低 alpha 堆叠 + inset 白高光）、玻璃拟态（backdrop-blur + 半透）应用于 tabbar/filters/keybar、header 软分离阴影。
+    - 韩文美感：font-feature palt/halt/optical + 针对性 tracking 强化；analyzer-title 优雅收紧；surface/headers 更优排版呼吸。
+    - 诗意空状态（核心 dwell 提升）：
+      - 分析器：全新 journal 风格 .poetic-empty + 精致内联笔记本线稿 SVG + 「纸页轻展。静待第一缕韩语，像晨光落在松针。」
+      - 历史：复用并增强已有诗意基础 + 叠加纸纹容器，统一「林间空地」意境。
+    - 卡片/模态精炼：圆角微调、token-card 内高光边、header 渐变装饰 divider、modal 更丰富浮空阴影。
+    - 微细节：focus-ring 加柔光、result-divider 优雅渐变、所有交互 transition 统一优雅 cubic-bezier、hover 阴影一致升级。
+  • 完全遵守：低饱和治愈 restrained（Task 2 tokens 100% 复用）、无新文件、无重动画、无高饱和。
+  • 质量门禁：eslint 0 错 0 警告；tsc --noEmit 0 错；npm run build 成功（生产就绪，IndexedDB 构建警告为历史已知）。
+  效果：页面现在像一本安静、触感丰富、留白的韩语学习札记。用户即使不输入，也会因材质、留白、诗意而多停留。
