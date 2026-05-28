@@ -2076,7 +2076,7 @@ export default function SentenceAnalyzerPage() {
                     </p>
                   </>
                 )}
-              </div>
+              </motion.div>
             )}
 
             {/* Poetic empty state — Subagent 4: a calm journal page inviting the first sentence */}

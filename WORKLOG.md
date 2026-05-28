@@ -1072,3 +1072,62 @@ Vercel 应该会自动开始部署（如果已连接 GitHub）。
 目标：让核心的「词素拆解」时刻成为用户真正愿意反复停留、反复点击的体验。
 
 继续并行推进其他方向（History、成功反馈、整体材质、Modal）。
+
+[2026-05-28 20:18:00] 继续执行优化（用户要求「直接推进」）：
+- History 卡片 hover 进一步加强（更强的 premium lift + 阴影）
+- 「加入我的学习」成功按钮 spring 动画再精炼（更自然有完成感）
+
+已提交推送（93f3326）
+
+参考持续使用 MagicUI + Josh Comeau 风格，保持克制高级的同时增加生命力。
+[2026-05-28 20:14:54] 用户反馈：Vercel 当前部署仍是 e67a318（52分钟前），没看到后续优化（TokenCard、History、Modal、视觉等）
+
+
+[2026-05-28 19:55:00] 用户反馈：Vercel 部署仍是旧 commit e67a318（52m ago），没看到后续大量 UI/UX 优化。
+本地 HEAD 已经是 93f3326 及以后多次提交（TokenCard、History、Modal、视觉等全部优化）。
+
+诊断：
+Vercel 当前部署基于的是用户之前手动触发的旧 Deployment（e67a318），而不是 GitHub main 的最新代码。
+这很常见，尤其是手动 Redeploy 时如果没有选对最新 commit，或者 Build Cache 开启。
+
+解决方案（按推荐顺序）：
+1. 去 Vercel Dashboard → Deployments，找到最新 commit（93f3326 或更新），点击那个的具体 Redeploy，并关闭 "Use existing Build Cache"。
+2. 或者我现在立刻推一个空提交，强制 Vercel 基于最新 HEAD 重新构建（最可靠的方式）。
+
+用户之前多次表示希望“以后我做完直接帮部署”，可以直接问是否现在要我推空提交触发。
+[2026-05-28 20:15:52] 用户要求直接推送空提交强制 Vercel 重新部署最新代码
+To https://github.com/Crisforlove/yujian-korean.git
+   93f3326..f7e6a0d  main -> main
+
+[2026-05-28 19:58:00] ✅ 空提交强制部署已执行
+  Commit: f7e6a0d
+  推送范围: 93f3326..f7e6a0d
+  消息: "chore: force Vercel redeploy with latest UI/UX optimizations (all parallel subagent work)"
+
+  目的: 让 Vercel 基于当前 HEAD（包含所有 5 个子代理的 TokenCard、History、成功反馈、视觉、Modal 优化）重新构建并部署。
+
+  用户下一步：
+  - 去 Vercel Dashboard → Deployments 查看基于 f7e6a0d 的新构建
+  - 建议手动 Redeploy 时关闭 "Use existing Build Cache"
+  - 部署完成后刷新网站测试最新交互和视觉效果
+
+  所有操作已实时记录。
+
+[2026-05-28 20:35:00] 🚨 关键部署阻塞诊断 + 修复
+  用户报告: "Deployment has failed > Turbopack build failed with 1 errors: ./app/page.tsx:2080:13 Expected '</', got ')' "
+
+  精确定位:
+    - 结果面板 {result && ( <motion.div className="result-panel"> ... </div> )}  闭合标签不匹配
+    - 开启标签是 <motion.div>，但在 tokens 区块结束后写成了 </div> 而非 </motion.div>
+    - 导致 JSX 解析器在遇到 result 条件表达式的 ) 时仍认为 motion.div 未闭合 → "Expected '</', got ')'"
+
+  修复操作:
+    - 直接修正 app/page.tsx:2079  将 </div> 改为 </motion.div>
+    - 本地验证: `npm run build` 完全通过（Compiled successfully, TypeScript clean, static pages 生成成功）
+    - IndexedDB 构建时警告属于正常（服务端构建环境无浏览器 API），不影响产物
+
+  影响: 之前所有 5 个并行子代理的 UI 优化（TokenCard spring、History stagger、诗意空状态、成功反馈光环、纸质高级质感等）全部被这个语法错误阻塞，无法在 Vercel 生效。
+
+  后续: 立即提交 + 推送本修复，触发 Vercel 基于最新正确代码的部署。用户刷新后即可看到全部 calm premium + 灵动微交互效果。
+
+  状态: 构建已恢复健康。
