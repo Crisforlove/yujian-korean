@@ -996,6 +996,11 @@ a:hover {
   color: var(--color-text-primary);
   background: var(--color-bg-elevated);
 }
+.view-tab:focus-visible {
+  outline: 2px solid var(--color-accent-sage);
+  outline-offset: 2px;
+  color: var(--color-text-primary);
+}
 .view-tab.active {
   background: var(--color-bg-surface);
   color: var(--color-text-primary);
@@ -1485,4 +1490,74 @@ a:hover {
   .settings-key-actions {
     justify-content: flex-start;
   }
+}
+
+/* ==========================================================================
+   Task 9: Responsive + Navigation Polish
+   - Header + view switcher on small screens (prevent crowding, maintain tap targets)
+   - Consistent generous touch areas and breathing
+   - No impact on desktop
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  /* Stack header content (title + switcher) on phones/tablets for breathing room */
+  .analyzer-header .max-w-4xl {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .analyzer-header .max-w-4xl > .flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  /* Slightly more compact but still comfortable tabs (min 44px tap height preserved) */
+  .view-switcher {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .view-tab {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 0.5rem 0.5rem; /* larger vertical tap target */
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+  .view-tab .lucide {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Slightly tighter header padding on small screens while keeping calm whitespace */
+  .analyzer-header {
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Ensure main content never feels cramped */
+  main.max-w-4xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Ultra-narrow phones: further compact tabs without losing legibility */
+  .view-tab {
+    font-size: 0.6875rem;
+    padding: 0.4375rem 0.25rem;
+  }
+}
+
+/* Tiny kbd hint polish (used in empty state + hints for shortcuts) */
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-subtle);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--color-text-tertiary);
 }

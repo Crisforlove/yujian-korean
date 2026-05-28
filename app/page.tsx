@@ -19,7 +19,8 @@ import {
   Award,
   Filter,
   RefreshCw,
-  Settings
+  Settings,
+  Pencil
 } from 'lucide-react';
 
 import { analyzeSentenceWithKey, AnalysisError } from '@/lib/llm/analyzer';
@@ -829,6 +830,65 @@ export default function SentenceAnalyzerPage() {
   const [showHistoryToast, setShowHistoryToast] = useState<string | null>(null);
 
   // ------------------------------------------------------------------------
+  // Task 9: Refs for keyboard support (view tabs + sentence input focus)
+  // ------------------------------------------------------------------------
+  const analyzerTabRef = React.useRef<HTMLButtonElement>(null);
+  const historyTabRef = React.useRef<HTMLButtonElement>(null);
+  const settingsTabRef = React.useRef<HTMLButtonElement>(null);
+  const sentenceInputRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const viewOrder: ('analyzer' | 'history' | 'settings')[] = ['analyzer', 'history', 'settings'];
+
+  // Centralized view switcher (allows keyboard + click unification)
+  const switchView = (view: 'analyzer' | 'history' | 'settings') => {
+    if (view === 'history') {
+      handleSwitchToHistory();
+    } else {
+      setActiveView(view);
+    }
+  };
+
+  // Full keyboard navigation for the view tablist (ARIA tabs pattern)
+  // Arrows, Home, End — roving tabindex + focus management. No new files.
+  const handleViewTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = viewOrder.indexOf(activeView);
+    let nextIndex = currentIndex;
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        nextIndex = (currentIndex + 1) % viewOrder.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        nextIndex = (currentIndex - 1 + viewOrder.length) % viewOrder.length;
+        break;
+      case 'Home':
+        e.preventDefault();
+        nextIndex = 0;
+        break;
+      case 'End':
+        e.preventDefault();
+        nextIndex = viewOrder.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    const nextView = viewOrder[nextIndex];
+    switchView(nextView);
+
+    // Move focus to the newly active tab button
+    const refs = [analyzerTabRef, historyTabRef, settingsTabRef];
+    // Defer focus to after state update + re-render
+    window.setTimeout(() => {
+      refs[nextIndex].current?.focus();
+    }, 0);
+  };
+
+  // ------------------------------------------------------------------------
   // API Key persistence helpers (writes only — no effect sets)
   // ------------------------------------------------------------------------
   const updateApiKey = useCallback((value: string) => {
@@ -1155,7 +1215,7 @@ export default function SentenceAnalyzerPage() {
       window.setTimeout(() => setShowHistoryToast(null), 2400);
 
       // Optionally return user to analyzer for fresh start
-      setActiveView('analyzer');
+      switchView('analyzer');
     } catch (e) {
       console.error('[Task8] clearAllData failed', e);
       alert('清除失败，请重试或刷新页面。');
@@ -1234,6 +1294,46 @@ export default function SentenceAnalyzerPage() {
   };
 
   const closeReplay = () => setReplayItem(null);
+
+  // ------------------------------------------------------------------------
+  // Task 9: Global keyboard shortcuts (/, Esc for modals, etc.)
+  // Placed after handler declarations so all referenced fns (close*) are defined.
+  // Single listener at root for consistency across views. Respects inputs.
+  // ------------------------------------------------------------------------
+  React.useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
+      // '/' focuses sentence input (only in analyzer view, when not typing)
+      if (e.key === '/' && !isTyping && activeView === 'analyzer') {
+        e.preventDefault();
+        sentenceInputRef.current?.focus();
+        sentenceInputRef.current?.select?.(); // optional: select existing for overwrite ease
+        return;
+      }
+
+      // Global Esc closes any open modal (WordDetail or Replay). Modals also listen locally (defensive).
+      if (e.key === 'Escape') {
+        if (selectedDetail) {
+          closeWordDetail();
+        } else if (replayItem) {
+          closeReplay();
+        }
+        // (no else — don't swallow Esc from other native elements)
+      }
+
+      // Optional quality-of-life: '?' shows a tiny hint toast when idle in analyzer (non-intrusive)
+      if (e.key === '?' && !isTyping && activeView === 'analyzer' && !result && !isLoading) {
+        // non-blocking visual hint (reuse existing toast pattern for 1.6s)
+        setShowHistoryToast('提示：按 / 聚焦输入框 · Cmd/Ctrl+Enter 分析 · 点击词元查详情');
+        window.setTimeout(() => setShowHistoryToast(null), 1600);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [activeView, selectedDetail, replayItem, result, isLoading]);
 
   // Full export: JSON + beautiful Markdown (Task 7)
   const handleExport = () => {
@@ -1355,27 +1455,38 @@ export default function SentenceAnalyzerPage() {
             </div>
 
             {/* Elegant view switcher (Task 7+8) — analyzer / history / settings. Pure client state, no routes. */}
-            <div className="view-switcher" role="tablist" aria-label="主视图切换">
+            <div 
+              className="view-switcher" 
+              role="tablist" 
+              aria-label="主视图切换"
+              onKeyDown={handleViewTabKeyDown}
+            >
               <button
+                ref={analyzerTabRef}
                 role="tab"
                 aria-selected={activeView === 'analyzer'}
-                onClick={() => setActiveView('analyzer')}
+                tabIndex={activeView === 'analyzer' ? 0 : -1}
+                onClick={() => switchView('analyzer')}
                 className={`view-tab ${activeView === 'analyzer' ? 'active' : ''}`}
               >
-                分析句子
+                <Pencil className="w-3.5 h-3.5" /> 分析句子
               </button>
               <button
+                ref={historyTabRef}
                 role="tab"
                 aria-selected={activeView === 'history'}
+                tabIndex={activeView === 'history' ? 0 : -1}
                 onClick={handleSwitchToHistory}
                 className={`view-tab ${activeView === 'history' ? 'active' : ''}`}
               >
                 <History className="w-3.5 h-3.5" /> 我的学习
               </button>
               <button
+                ref={settingsTabRef}
                 role="tab"
                 aria-selected={activeView === 'settings'}
-                onClick={() => setActiveView('settings')}
+                tabIndex={activeView === 'settings' ? 0 : -1}
+                onClick={() => switchView('settings')}
                 className={`view-tab ${activeView === 'settings' ? 'active' : ''}`}
               >
                 <Settings className="w-3.5 h-3.5" /> 设置
@@ -1389,14 +1500,14 @@ export default function SentenceAnalyzerPage() {
         {/* Conditional rendering: Analyzer / History (Task 7) / Settings (Task 8) — single file, no new routes or files */}
         {activeView === 'analyzer' ? (
           <>
-            {/* Slim API Key status — full management moved to Settings (Task 8) */}
+            {/* Slim API Key status — full management in 设置 view */}
             <div className="api-key-status">
               <KeyRound className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" />
               <span className="text-sm text-[var(--color-text-secondary)]">
                 {isKeySaved ? 'Anthropic API Key 已安全保存于本地浏览器' : '尚未配置 API Key'}
               </span>
               <button
-                onClick={() => setActiveView('settings')}
+                onClick={() => switchView('settings')}
                 className="api-key-manage-link"
               >
                 在设置中管理 →
@@ -1410,6 +1521,7 @@ export default function SentenceAnalyzerPage() {
               </label>
               <div className="sentence-input-wrapper">
                 <textarea
+                  ref={sentenceInputRef}
                   value={sentenceInput}
                   onChange={(e) => setSentenceInput(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -1604,7 +1716,7 @@ export default function SentenceAnalyzerPage() {
             {!result && !isLoading && !error && (
               <div className="mt-10 text-center text-[var(--color-text-tertiary)] text-sm">
                 输入句子后点击「分析句子」即可获得完整的词源标注、语法解析与中英翻译。<br />
-                结果中的每个词元卡片均可点击打开「单词详情」（Task 6），或直接使用上方的「快速查词」独立查找。
+                按 <kbd className="px-1 py-0.5 rounded bg-[var(--color-bg-subtle)] font-mono text-[10px]">/</kbd> 聚焦输入 · 方向键切换标签页 · 每个词元卡片可点击查看详情与加入学习。
               </div>
             )}
           </>
@@ -1833,10 +1945,10 @@ export default function SentenceAnalyzerPage() {
         )}
       </main>
 
-      {/* Subtle footer note — security & scope transparent (updated for Task 8) */}
+      {/* Subtle footer note — security & scope transparent */}
       <footer className="max-w-4xl mx-auto px-6 pb-12 text-[10px] text-[var(--color-text-muted)] text-center tracking-wide">
         API Key 仅在浏览器本地保存并通过 HTTPS 安全发送至 /api/analyze（服务端使用后立即丢弃）。<br />
-        Task 8 设置：本地 Key 管理（密码输入 + 自动保存/清除）+ 获取指引链接 + 清除全部数据（确认保护）。完全本地，尊重隐私。
+        所有数据与密钥严格本地化 · 尊重您的隐私与控制权 · 按 / 聚焦输入 · 方向键导航标签页
       </footer>
 
       {/* Auto-save toast (sentence) */}
