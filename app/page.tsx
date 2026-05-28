@@ -2418,8 +2418,13 @@ export default function SentenceAnalyzerPage() {
                       className="w-full text-sm px-3 py-2 rounded border border-[var(--color-border)] bg-[var(--color-bg-surface)]"
                     />
                     <div className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                      如果你使用中转站，请在这里填写完整 Base URL（包含 /v1）
+                      如果你使用中转站（如 vpsairobot），请填写完整 Base URL（通常是 https://api.xxx.com/v1）
                     </div>
+                    {provider === 'openai' && (
+                      <div className="mt-1 text-[10px] text-[var(--color-accent-sage)]">
+                        提示：vpsairobot 用户可尝试填写你的中转站地址
+                      </div>
+                    )}
                   </div>
                 )}
 

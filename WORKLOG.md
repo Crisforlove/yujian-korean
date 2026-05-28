@@ -942,3 +942,16 @@ To https://github.com/Crisforlove/yujian-korean.git
 
 用户以后改完代码后，只需要运行这个脚本即可完成部署同步。
 [2026-05-28 18:23:49] 优化了 Key 测试按钮的交互反馈（设置页内直接显示错误）
+
+[2026-05-28 19:42:00] 针对中转站 403 问题做了关键修复：
+- 当用户填写自定义 Base URL 时（即使用中转站），不再发送自定义 User-Agent。
+- 这样可以避免很多严格的中转站因为识别到自定义 UA 而直接返回 403。
+- OpenAI/DeepSeek 兼容调用现在对中转站更友好。
+
+用户使用 vpsairobot.com 时，请务必在设置中：
+1. 选择 OpenAI 或 DeepSeek 作为提供商
+2. 填写正确的 Base URL（通常是 https://api.vpsairobot.com/v1 或类似）
+3. 输入他们的 Key
+4. 点击测试
+
+这个改动已推送到 GitHub (a444d51)
