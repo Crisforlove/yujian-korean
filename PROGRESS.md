@@ -251,3 +251,10 @@ Vercel 部署：
 - `npm run build` 再次 0 错误全通过
 - 现在可以给用户一个「直接审阅、值得停留」的线上版本了
 - 立即 commit + ./scripts/deploy.sh 重新推送
+
+[实时更新] 2026-05-28 21:05 — Naver 词典混合体验（按推荐方案）
+- 采用「跳转 Naver 官方」作为主力 + 内部预览 API 作为辅助的混合策略（最推荐路线）
+- 在 TokenCard 和 WordDetailModal 都增加了优雅的「在 Naver 词典查看」入口（带 Hanja 直达）
+- 新建安全 /api/naver-dict 路由（带 Referer+UA、缓存、短超时、优雅降级）
+- 所有样式使用设计令牌，保持 calm premium 质感
+- Build 完全通过

@@ -21,7 +21,8 @@ import {
   Filter,
   RefreshCw,
   Settings,
-  Pencil
+  Pencil,
+  ExternalLink
 } from 'lucide-react';
 
 import { analyzeSentenceWithKey, AnalysisError } from '@/lib/llm/analyzer';
@@ -79,6 +80,18 @@ function generateId(): string {
     return crypto.randomUUID();
   }
   return 'wd_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
+}
+
+/** Premium deep links to Naver Dictionary — the best way to experience their excellent etymology + Hanja presentation */
+function getNaverDictUrl(text: string): string {
+  const q = encodeURIComponent(text.trim());
+  // target=dic gives access to the full dictionary experience (including Korean-Chinese tab for our users)
+  return `https://dict.naver.com/#/search?query=${q}&target=dic`;
+}
+
+function getNaverHanjaUrl(hanja: string): string {
+  const q = encodeURIComponent(hanja.trim());
+  return `https://hanja.dict.naver.com/#/search?query=${q}`;
 }
 
 // --------------------------------------------------------------------------
@@ -241,6 +254,19 @@ function TokenCard({ token, onClick }: { token: Token; onClick?: (token: Token) 
         <div className="token-hanja">{token.hanja}</div>
       )}
 
+      {/* Naver deep link — our recommended way to access the absolute best etymology + Hanja visuals */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          window.open(getNaverDictUrl(token.text), '_blank', 'noopener,noreferrer');
+        }}
+        className="token-naver-link text-[10px] text-[var(--color-accent-sage)] hover:text-[var(--color-accent-warm)] transition-colors flex items-center gap-1 mt-1.5"
+        title="在 Naver 词典中查看完整词源、汉字与例句"
+      >
+        在 Naver 查看 <ExternalLink className="w-3 h-3" />
+      </button>
+
       {/* Gentle "click to see details" affordance — responds to card hover state via variants */}
       {isClickable && (
         <motion.div
@@ -396,6 +422,31 @@ function WordDetailModal({
               独立查词时暂无上下文例句。可在句子分析结果中点击词元获得丰富例句。
             </div>
           )}
+        </div>
+
+        {/* Naver Dictionary deep link — the best way to see rich etymology tags, Hanja visuals & full examples (recommended hybrid approach) */}
+        <div className="word-detail-naver-cta mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
+          <div className="text-[11px] text-[var(--color-text-tertiary)] mb-2 tracking-wide">
+            Naver 词典提供最完整的词源分类（固有词 / 汉字词 / 外来词）、汉字详解与丰富例句
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => window.open(getNaverDictUrl(token.text), '_blank', 'noopener,noreferrer')}
+              className="naver-cta-button flex items-center gap-1.5"
+            >
+              在 Naver 词典查看完整内容
+              <ExternalLink className="w-3.5 h-3.5" />
+            </button>
+            {token.hanja && (
+              <button
+                onClick={() => window.open(getNaverHanjaUrl(token.hanja!), '_blank', 'noopener,noreferrer')}
+                className="naver-cta-button flex items-center gap-1.5"
+              >
+                查看汉字词源
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Actions */}

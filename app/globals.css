@@ -805,6 +805,39 @@ body {
   opacity: 0.85;
 }
 
+/* Naver deep link actions — calm, secondary, premium (hybrid recommendation) */
+.token-naver-link {
+  font-family: var(--font-sans);
+  letter-spacing: 0.01em;
+  opacity: 0.75;
+}
+
+.token-naver-link:hover {
+  opacity: 1;
+}
+
+.naver-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-accent-sage);
+  transition: all 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  white-space: nowrap;
+}
+
+.naver-cta-button:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-accent-sage);
+  color: var(--color-accent-warm);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
 /* Standalone word lookup section */
 .word-lookup-section {
   background: var(--color-bg-elevated);

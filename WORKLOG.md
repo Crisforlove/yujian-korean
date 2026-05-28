@@ -1147,3 +1147,11 @@ To https://github.com/Crisforlove/yujian-korean.git
   质量门禁: 本地 `npm run build` 再次全绿（Compiled successfully + TypeScript 0 error）。
 
   现在状态: 语法错误已修复 + 所有主要 UI 反馈与 Modal 物理动画已完整打磨。准备干净提交 + 重新 push，触发 Vercel 部署最新「可直接审阅」版本。
+
+[2026-05-28 21:05] Naver 词典集成（按用户「按你推荐吧」执行）
+  推荐方案落地：
+  - 主力：TokenCard + WordDetailModal 内增加克制优雅的「在 Naver 词典查看」按钮（优先韩中词典 + Hanja 词典直达）
+  - 辅助：新建 /api/naver-dict/[word]（使用内部 api3 + 正确 Referer/UA，30min 缓存，任何失败都静默返回空 → 前端自动靠 Naver 按钮兜底）
+  - 目的：用户能最轻松地获得 Naver 最强的词源分类 + 汉字视觉讲解，同时尽量减少不必要的跳转
+  - 零风险：所有核心数据仍由 LLM 负责句子拆解，本地存储不变
+  - Build 通过，样式完全复用 design tokens
