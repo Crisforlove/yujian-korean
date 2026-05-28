@@ -461,3 +461,42 @@ All 4 required files created. Now: typecheck + commits.
   - 准备执行干净的单次 Git 提交（仅包含本次变更：README、AGENTS、WORKLOG、微小 lint 清理）
   - 提交后 Task 10 正式结束，yujian-korean MVP 完整交付
 
+
+[2026-05-28 17:45:00] ✅ Task 10 全部完成！
+  - 干净 Git 提交：9014c44 docs: complete Task 10 - Final MVP Validation & Documentation
+    (4 files changed, +321/-21)
+    精确包含：README.md（优秀重写）、AGENTS.md（最小扩展）、WORKLOG.md（多次追加）、lib/llm/client.ts（lint 清理）
+  - 验证：lint 0警告、tsc 0错、build 成功
+  - PROGRESS.md 未改动（保持原样，未纳入本次提交）
+  - Task 10 子代理正式结束。yujian-korean MVP 验证与文档阶段圆满收官。
+  - 下一阶段准备：部署（GitHub yujian-korean + Vercel）
+
+
+[2026-05-28 16:47:50] ✅ Task 10 子代理执行完成
+  Status: DONE (224秒, 76 tool calls)
+  Subagent ID: 019e6dc1-2b2b-7102-97cf-21ce2e402e1b
+
+[2026-05-28 16:47:55] Task 10 核心交付:
+  - 完整端到端 MVP 验证（分析 → Token 词源 → 单词详情 → 保存学习 → 历史筛选导出 → 设置清除数据 → 全部键盘快捷键）
+  - README.md 全面重写（中文优先，哲学说明、获取 Key 步骤、功能清单、键盘表、已知限制）
+  - AGENTS.md 扩展（未来 agent 指南：命令、架构、日志规则、无新文件纪律）
+  - 所有质量门禁通过（lint / tsc / build）
+
+[2026-05-28 16:48:00] Git 提交:
+  - 9014c44 docs: complete Task 10 - Final MVP Validation & Documentation
+    (4 files, +321/-21)
+
+[2026-05-28 16:48:05] 核心任务全部完成！项目已达到可部署状态。
+
+[2026-05-28 16:48:10] 下一阶段：部署准备
+  - 推送到 GitHub (Crisforlove/yujian-korean)
+  - Vercel 部署（真实可用网站，支持完整 Claude 调用）
+  - 将在日志中继续实时记录部署步骤
+
+[2026-05-28 16:48:20] 部署准备阶段开始
+  - 当前 git 状态检查中...
+  - 将创建/更新 vercel.json 以优化 Next.js 部署
+  - 准备推送到 GitHub (yujian-korean) + Vercel 部署流程
+
+[2026-05-28 16:48:06] Git 状态已记录（见上方）
+[2026-05-28 16:48:10] 已创建 vercel.json（优化 Next.js 部署）
